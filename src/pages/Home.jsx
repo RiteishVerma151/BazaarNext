@@ -1,0 +1,25 @@
+import Navbar from "../components/Navbar.jsx";
+import Hero from "../components/Hero.jsx";
+import CategorySection from "../components/CategorySection.jsx";
+import ProductSection from "../components/ProductSection.jsx";
+import HowItWorks from "../components/HowItWorks.jsx";
+import SellCTA from "../components/SellCTA.jsx";
+import Footer from "../components/Footer.jsx";
+import { freshProducts, topProducts } from "../data/products.js";
+
+export default function Home() {
+  return (
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <CategorySection />
+        <ProductSection id="products" title="Fresh near you" products={freshProducts} />
+        <ProductSection id="top" title="Top selling products" products={topProducts} />
+        <HowItWorks />
+        <SellCTA />
+      </main>
+      <Footer />
+    </>
+  );
+}

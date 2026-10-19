@@ -1,0 +1,18 @@
+.navbar { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
+.navbar-row { display: flex; align-items: center; height: 64px; gap: 18px; position: relative; }
+.logo { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
+.logo span { color: var(--teal); }
+
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.nav-links a:not(.btn) { padding: 8px 12px; border-radius: 8px; font-weight: 500; font-size: 15px; }
+.nav-links a:not(.btn):hover { background: var(--bg); }
+
+.menu-btn { display: none; margin-left: auto; background: none; border: 1px solid var(--line); border-radius: 8px; width: 42px; height: 42px; cursor: pointer; flex-direction: column; justify-content: center; align-items: center; gap: 4px; }
+.menu-btn span { width: 18px; height: 2px; background: var(--ink); display: block; }
+
+@media (max-width: 820px) {
+  .menu-btn { display: flex; }
+  .nav-links { display: none; position: absolute; top: 64px; left: 0; right: 0; background: var(--card); border-bottom: 1px solid var(--line); flex-direction: column; align-items: stretch; padding: 12px 20px 18px; margin: 0; gap: 4px; }
+  .nav-links.open { display: flex; }
+  .nav-links .nav-login { text-align: center; margin-top: 8px; }
+}

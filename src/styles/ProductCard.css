@@ -1,0 +1,12 @@
+.prod { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+.prod-img { height: 150px; position: relative; display: flex; align-items: center; justify-content: center; padding: 22px 14px 10px; }
+.prod-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.cond { position: absolute; left: 10px; top: 10px; background: #fff; color: var(--ink); font: 700 12px "DM Sans", sans-serif; padding: 3px 10px; border-radius: 99px; }
+.wish { position: absolute; right: 10px; top: 10px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: #fff; cursor: pointer; font-size: 17px; line-height: 1; color: var(--muted); }
+.wish.on { color: #d6336c; }
+.prod-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.prod-body h3 { font-size: 17px; font-weight: 700; }
+.meta { font-size: 13px; color: var(--muted); }
+.prod-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 10px; }
+.price { font: 800 20px "Bricolage Grotesque", sans-serif; }
+.prod-row a { font-size: 14px; font-weight: 700; color: var(--teal); }

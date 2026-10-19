@@ -1,0 +1,11 @@
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 18px; }
+
+@media (max-width: 560px) {
+  .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .prod-img { height: 110px !important; padding: 28px 10px 6px !important; }
+  .prod-body { padding: 10px 12px 12px !important; }
+  .prod-body h3 { font-size: 15px !important; }
+  .price { font-size: 17px !important; }
+  .prod-row a { font-size: 13px !important; }
+}
+@media (max-width: 360px) { .product-grid { grid-template-columns: 1fr; } }
