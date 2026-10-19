@@ -1,0 +1,133 @@
+.sidebar {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* User Info Header */
+.userInfo {
+  padding: 24px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #1a2b4c;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  flex: none;
+}
+
+.userText h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a2b4c;
+  margin: 0 0 4px 0;
+}
+
+.userText p {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  word-break: break-all;
+}
+
+/* Navigation Menu */
+.menu {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menuBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.menuBtn:hover {
+  background: #f3f4f6;
+  color: #1a2b4c;
+}
+
+.menuBtn.active {
+  background: #eff6ff; /* Halka blue background */
+  color: #1a2b4c;
+}
+
+/* Logout */
+.logoutWrap {
+  padding: 12px;
+  border-top: 1px solid #e5e7eb;
+  margin-top: auto;
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #dc2626; /* Red color for logout */
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+  background: #fef2f2;
+}
+
+/* Mobile tweaks */
+@media (max-width: 800px) {
+  .sidebar {
+    /* Mobile pe horizontal scrollable menu banate hain agar zaroorat pade */
+    border-radius: 16px;
+  }
+  .userInfo {
+    padding: 16px;
+  }
+  .menu {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 8px;
+  }
+  .menuBtn {
+    width: auto;
+    white-space: nowrap;
+    padding: 10px 16px;
+  }
+  .logoutWrap {
+    display: none; /* Mobile pe logout ko navbar me rakh sakte hain */
+  }
+}

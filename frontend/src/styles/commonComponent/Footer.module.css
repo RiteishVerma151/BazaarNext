@@ -1,0 +1,22 @@
+
+.footer {
+  margin-top: 48px;
+  border-top: 1px solid var(--line);
+  background: var(--card);
+  padding: 28px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.footerRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer nav {
+  display: flex;
+  gap: 18px;
+}

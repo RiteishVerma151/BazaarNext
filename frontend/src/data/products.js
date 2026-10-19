@@ -1,13 +1,16 @@
-// Real photo (jpg/jpeg/png/webp) agar src/assets/products/ me mili to wahi use hogi, warna svg.
-const files = import.meta.glob("../assets/products/*.{jpg,jpeg,png,webp,svg}", { eager: true, import: "default" });
+
+const files = import.meta.glob("../assets/products/*.{jpg,jpeg,png,webp,svg}", { eager: true, import: "default" })
+
 const pic = (name) => {
   for (const ext of ["jpg", "jpeg", "png", "webp", "svg"]) {
     const f = files[`../assets/products/${name}.${ext}`];
     if (f) return f;
   }
-};
+}
+
 const cycle = pic("cycle"), backpack = pic("backpack"), table = pic("table"), chair = pic("chair");
-const calculator = pic("calculator"), fan = pic("fan"), books = pic("books"), speaker = pic("speaker");
+const calculator = pic("calculator"), fan = pic("fan"), books = pic("books"), speaker = pic("speaker")
+
 
 export const categories = [
   { id: 1, name: "Electronics", hint: "Phones, laptops" },

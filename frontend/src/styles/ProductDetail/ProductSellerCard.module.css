@@ -1,0 +1,51 @@
+.sellerCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  margin-bottom: 28px;
+}
+.sellerAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #1a2b4c;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+.sellerInfo { flex: 1; }
+.sellerInfo h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a2b4c;
+  margin: 0 0 4px 0;
+}
+.sellerInfo p {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+.viewProfileBtn {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a2b4c;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.viewProfileBtn:hover { background: #f3f4f6; border-color: #1a2b4c; }
+
+@media (max-width: 600px) {
+  .sellerCard { flex-direction: column; align-items: flex-start; }
+  .viewProfileBtn { width: 100%; text-align: center; }
+}

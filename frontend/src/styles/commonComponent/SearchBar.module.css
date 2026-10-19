@@ -1,0 +1,14 @@
+.search { display: flex; flex-wrap: nowrap; width: 100%; background: var(--card); border: 2px solid var(--ink); border-radius: 14px; overflow: hidden; max-width: 560px; }
+.search input { flex: 1; border: 0; padding: 15px 16px; font: 500 16px "DM Sans", sans-serif; background: transparent; min-width: 0; text-overflow: ellipsis; }
+.search input:focus { outline: none; }
+.search:focus-within { box-shadow: 0 0 0 3px rgba(15, 122, 107, 0.35); }
+.search .btn { border-radius: 0; padding: 0 24px; flex: none; white-space: nowrap; display: flex; align-items: center; justify-content: center; }
+.btnIcon { display: none; }
+
+@media (max-width: 560px) {
+  .search { border-radius: 12px; }
+  .search input { padding: 13px 12px; }
+  .search .btn { padding: 0 16px; }
+  .search .btnText { display: none; }
+  .search .btnIcon { display: block; }
+}

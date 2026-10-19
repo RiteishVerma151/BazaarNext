@@ -5,7 +5,13 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
-import { protect } from "./middleware/authMiddleware.js";
+import userRoutes from "./routes/userRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
+import wishlistRoutes from "./routes/wishlistRoutes.js";
+import negotiationRoutes from "./routes/negotiationRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+
+
 
 const app = express();
 
@@ -23,23 +29,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/negotiations", negotiationRoutes);
+app.use("/api/orders", orderRoutes);
+
 
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
     message: "BazaarNext API running",
-  });
-});
-
-app.get("/api/users/me", protect, (req, res) => {
-  res.status(200).json({
-    success: true,
-    user: {
-      id: req.user._id,
-      name: req.user.name,
-      email: req.user.email,
-      role: req.user.role,
-    },
   });
 });
 

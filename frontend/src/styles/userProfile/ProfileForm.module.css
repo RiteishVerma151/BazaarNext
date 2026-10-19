@@ -1,0 +1,107 @@
+.formCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.formHeader {
+  margin-bottom: 28px;
+}
+
+.formHeader h2 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a2b4c;
+  margin: 0 0 6px 0;
+}
+
+.formHeader p {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputGroup label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a2b4c;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #1a2b4c;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: #1a2b4c;
+  box-shadow: 0 0 0 3px rgba(26, 43, 76, 0.1);
+}
+
+.formFooter {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.saveBtn {
+  background: #f5a623;
+  color: #1a2b4c;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saveBtn:hover {
+  background: #e0961e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .formCard {
+    padding: 20px;
+    border-radius: 16px;
+  }
+  
+  .row {
+    grid-template-columns: 1fr; /* Mobile pe inputs ek ke neeche ek */
+    gap: 16px;
+  }
+  
+  .saveBtn {
+    width: 100%;
+  }
+}

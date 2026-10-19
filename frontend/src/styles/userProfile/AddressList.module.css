@@ -1,0 +1,193 @@
+.container {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.header h2 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a2b4c;
+  margin: 0 0 4px 0;
+}
+.header p { color: #6b7280; font-size: 14px; margin: 0; }
+
+.addBtn {
+  background: #1a2b4c;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.addBtn:hover { background: #111e35; }
+
+/* Address Grid */
+.addressGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.addressCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  background: #fff;
+  transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+.addressCard:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+.defaultCard { border-color: #1a2b4c; background: #f8f9fa; }
+
+.defaultBadge {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  background: #f5a623;
+  color: #1a2b4c;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.cardTop { margin-bottom: 12px; }
+.cardTop h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a2b4c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.addressDetails { flex: 1; margin-bottom: 20px; }
+.addressDetails strong {
+  display: block;
+  font-size: 15px;
+  color: #1a2b4c;
+  margin-bottom: 4px;
+}
+.addressDetails p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+.phone { margin-top: 8px !important; font-weight: 500; }
+
+.cardActions {
+  display: flex;
+  gap: 16px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 16px;
+}
+.editBtn, .deleteBtn, .defaultBtn {
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+.editBtn { color: #2563eb; }
+.deleteBtn { color: #dc2626; }
+.defaultBtn { color: #6b7280; margin-left: auto; }
+
+/* Form */
+.formCard {
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+}
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.formHeader h3 { font-size: 16px; font-weight: 700; color: #1a2b4c; margin: 0; }
+.closeBtn { background: transparent; border: none; font-size: 18px; color: #6b7280; cursor: pointer; }
+
+.form { display: flex; flex-direction: column; gap: 16px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.rowThree { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+.inputGroup { display: flex; flex-direction: column; gap: 6px; }
+.inputGroup label { font-size: 13px; font-weight: 600; color: #1a2b4c; }
+.inputGroup input, .inputGroup select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1a2b4c;
+  background: #fff;
+}
+.inputGroup input:focus, .inputGroup select:focus { outline: none; border-color: #1a2b4c; }
+
+.checkboxGroup { display: flex; align-items: center; padding-top: 24px; }
+.checkboxGroup label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #1a2b4c;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.formActions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+.cancelBtn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  color: #1a2b4c;
+  cursor: pointer;
+}
+.saveBtn {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  background: #f5a623;
+  color: #1a2b4c;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+.saveBtn:hover { background: #e0961e; }
+
+.emptyState { text-align: center; padding: 40px; color: #6b7280; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container { padding: 20px; border-radius: 16px; }
+  .addressGrid { grid-template-columns: 1fr; }
+  .row, .rowThree { grid-template-columns: 1fr; }
+  .checkboxGroup { padding-top: 0; }
+  .formActions { flex-direction: column-reverse; }
+  .formActions button { width: 100%; }
+  .header { flex-direction: column; align-items: flex-start; }
+  .addBtn { width: 100%; }
+}
