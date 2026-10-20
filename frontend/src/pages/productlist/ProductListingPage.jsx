@@ -1,94 +1,196 @@
+
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "../../components/commoncomponents/Navbar.jsx";
 import Footer from "../../components/commoncomponents/Footer.jsx";
 import ProductCard from "../../components/commoncomponents/ProductCard.jsx";
+import api from "../../lib/axios.js";
 import styles from "../../styles/productlist/ProductListingPage.module.css";
 
 const PAGE_SIZE = 12;
 
-const img = (id) =>
-  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=600&q=80`;
-
-// TODO: replace with real API data
-const PRODUCTS = [
-  { id: 1,  name: "School backpack",      price: 450,  condition: "Like new", info: "Ulhasnagar 1", image: img("1553062407-98eeb64c6a62"), category: "Bags",             keywords: "bag backpack school" },
-  { id: 2,  name: "Laptop bag",           price: 650,  condition: "Good",     info: "Ulhasnagar 2", image: img("1548036328-c9fa89d128fa"), category: "Bags",             keywords: "bag laptop office" },
-  { id: 3,  name: "Travel duffel bag",    price: 900,  condition: "Good",     info: "Ulhasnagar 3", image: img("1547949003-9792a18a2601"), category: "Bags",             keywords: "bag travel duffel" },
-  { id: 4,  name: "College sling bag",    price: 300,  condition: "Fair",     info: "Ulhasnagar 4", image: img("1591561954557-26941169b49e"), category: "Bags",           keywords: "bag sling college" },
-  { id: 5,  name: "Trekking rucksack",    price: 1800, condition: "Good",     info: "Ulhasnagar 1", image: img("1622260614153-03223fb72052"), category: "Bags",           keywords: "bag trekking rucksack" },
-  { id: 6,  name: "Tote bag",             price: 150,  condition: "Like new", info: "Ulhasnagar 2", image: img("1590874103328-eac38a683ce7"), category: "Bags",           keywords: "bag tote" },
-  { id: 7,  name: "Kids school bag",      price: 350,  condition: "Good",     info: "Ulhasnagar 5", image: img("1581605405669-fcdf81165afa"), category: "Bags",           keywords: "bag kids school" },
-  { id: 8,  name: "Office messenger bag", price: 700,  condition: "Like new", info: "Ulhasnagar 3", image: img("1553062407-98eeb64c6a62"), category: "Bags",             keywords: "bag office messenger" },
-  { id: 9,  name: "Gym bag",              price: 500,  condition: "Good",     info: "Ulhasnagar 4", image: img("1547949003-9792a18a2601"), category: "Bags",             keywords: "bag gym sports" },
-  { id: 10, name: "Camera bag",           price: 1200, condition: "Fair",     info: "Ulhasnagar 1", image: img("1502920917128-1aa500764cbd"), category: "Bags",           keywords: "bag camera" },
-  { id: 11, name: "Hand bag",             price: 400,  condition: "Good",     info: "Ulhasnagar 2", image: img("1584917865442-de89df76afd3"), category: "Bags",           keywords: "bag handbag ladies" },
-  { id: 12, name: "Waterproof backpack",  price: 950,  condition: "Like new", info: "Ulhasnagar 3", image: img("1622560480605-d83c853bc5c3"), category: "Bags",           keywords: "bag backpack waterproof" },
-  { id: 13, name: "Wheeled trolley bag",  price: 2200, condition: "Good",     info: "Ulhasnagar 5", image: img("1565026057447-bc90a3dceb87"), category: "Bags",           keywords: "bag trolley travel" },
-  { id: 14, name: "Laptop backpack",      price: 1100, condition: "Good",     info: "Ulhasnagar 4", image: img("1622560480605-d83c853bc5c3"), category: "Bags",           keywords: "bag backpack laptop" },
-  { id: 15, name: "Hero cycle",           price: 2800, condition: "Good",     info: "Ulhasnagar 3", image: img("1485965120184-e220f721d03e"), category: "Cycles",         keywords: "cycle bicycle" },
-  { id: 16, name: "Study table",          price: 1200, condition: "Fair",     info: "Ulhasnagar 4", image: img("1555041469-a586c61ea9bc"), category: "Furniture",         keywords: "table study desk" },
-  { id: 17, name: "Office chair",         price: 1500, condition: "Good",     info: "Ulhasnagar 2", image: img("1580480055273-228ff5388ef8"), category: "Furniture",       keywords: "chair office" },
-  { id: 18, name: "Table fan",            price: 900,  condition: "Good",     info: "Ulhasnagar 2", image: img("1558618666-fcd25c85cd64"), category: "Daily essentials", keywords: "fan table" },
+const CATEGORIES = [
+  "All",
+  "Electronics",
+  "Fashion",
+  "Books",
+  "Furniture",
+  "Home Appliances",
+  "Sports",
+  "Vehicles",
+  "Other",
 ];
 
-const CATEGORIES = ["All", ...Array.from(new Set(PRODUCTS.map((p) => p.category)))];
+const CONDITIONS = ["All", "Like New", "Good", "Fair"];
 
 const pageNumbers = (current, total) => {
-  if (total <= 6) return Array.from({ length: total }, (_, i) => i + 1);
+  if (total <= 6) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
   const out = [1];
+
   if (current > 3) out.push("…");
-  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) out.push(i);
+
+  for (
+    let i = Math.max(2, current - 1);
+    i <= Math.min(total - 1, current + 1);
+    i++
+  ) {
+    out.push(i);
+  }
+
   if (current < total - 2) out.push("…");
+
   out.push(total);
   return out;
 };
 
+const getImageUrl = (path) => {
+  if (!path) return "";
+
+  if (/^https?:\/\//i.test(path)) return path;
+
+  const baseURL = "http://localhost:3001";
+
+  return `${baseURL}${path.startsWith("/") ? "" : "/"}${path}`;
+};
+
 export default function ProductListingPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+
   const q = (searchParams.get("q") || "").trim();
   const cat = searchParams.get("cat") || "All";
   const sort = searchParams.get("sort") || "default";
-  const page = Math.max(1, parseInt(searchParams.get("page"), 10) || 1);
+  const condition = searchParams.get("condition") || "All";
+  const page = Math.max(
+    1,
+    parseInt(searchParams.get("page"), 10) || 1
+  );
 
   const [query, setQuery] = useState(q);
-  useEffect(() => setQuery(q), [q]);
+  const [products, setProducts] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const term = q.toLowerCase();
-  let results = PRODUCTS.filter((p) => {
-    if (cat !== "All" && p.category !== cat) return false;
-    if (term && !`${p.name} ${p.category} ${p.keywords}`.toLowerCase().includes(term)) return false;
-    return true;
-  });
+  useEffect(() => {
+    setQuery(q);
+  }, [q]);
 
-  if (sort === "price-asc")  results = [...results].sort((a, b) => a.price - b.price);
-  if (sort === "price-desc") results = [...results].sort((a, b) => b.price - a.price);
+  useEffect(() => {
+    let cancelled = false;
 
-  const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const visible = results.slice(start, start + PAGE_SIZE);
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const params = {
+          page,
+          limit: PAGE_SIZE,
+          sort,
+        };
+
+        if (q) params.search = q;
+        if (cat !== "All") params.category = cat;
+        if (condition !== "All") params.condition = condition;
+
+        const response = await api.get("/products", { params });
+
+        if (cancelled) return;
+
+        const data = response.data;
+
+        const normalizedProducts = (data.products ?? []).map(
+          (product) => ({
+            ...product,
+            id: product.id ?? product._id,
+            name: product.title,
+            image: getImageUrl(
+              product.images?.[0] ?? product.image
+            ),
+            info:
+              typeof product.location === "string"
+                ? product.location
+                : product.seller?.name || "Location not specified",
+          })
+        );
+
+        setProducts(normalizedProducts);
+        setTotal(data.total ?? normalizedProducts.length);
+        setTotalPages(data.totalPages ?? 0);
+      } catch (err) {
+        if (cancelled) return;
+
+        setProducts([]);
+        setTotal(0);
+        setTotalPages(0);
+        setError(
+          err.response?.data?.message ||
+            "Failed to load products. Please try again."
+        );
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchProducts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [q, cat, condition, sort, page]);
 
   const buildParams = (overrides = {}) => {
-    const next = { q, cat, sort, page: 1, ...overrides };
+    const next = {
+      q,
+      cat,
+      sort,
+      condition,
+      page: 1,
+      ...overrides,
+    };
+
     const out = {};
+
     if (next.q) out.q = next.q;
     if (next.cat && next.cat !== "All") out.cat = next.cat;
     if (next.sort && next.sort !== "default") out.sort = next.sort;
+    if (next.condition && next.condition !== "All") {
+      out.condition = next.condition;
+    }
     if (next.page && next.page > 1) out.page = next.page;
+
     return out;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSearchParams(buildParams({ q: query.trim(), page: 1 }));
+
+    setSearchParams(
+      buildParams({
+        q: query.trim(),
+        page: 1,
+      })
+    );
   };
 
-  const setCategory = (c) => setSearchParams(buildParams({ cat: c, page: 1 }));
-  const setSort     = (s) => setSearchParams(buildParams({ sort: s, page: 1 }));
+  const setCategory = (category) => {
+    setSearchParams(buildParams({ cat: category, page: 1 }));
+  };
 
-  const goToPage = (n) => {
-    setSearchParams(buildParams({ page: n }));
+  const setSort = (value) => {
+    setSearchParams(buildParams({ sort: value, page: 1 }));
+  };
+
+  const setCondition = (value) => {
+    setSearchParams(buildParams({ condition: value, page: 1 }));
+  };
+
+  const goToPage = (nextPage) => {
+    setSearchParams(buildParams({ page: nextPage }));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -102,15 +204,28 @@ export default function ProductListingPage() {
       <Navbar />
 
       <main className={`wrap ${styles.page}`}>
-        {/* Search + chips */}
         <div className={styles.searchWrap}>
-          <form className={styles.search} role="search" onSubmit={handleSubmit}>
+          <form
+            className={styles.search}
+            role="search"
+            onSubmit={handleSubmit}
+          >
             <span className={styles.searchIcon} aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <circle cx="11" cy="11" r="7" />
                 <path d="m21 21-4.3-4.3" />
               </svg>
             </span>
+
             <input
               type="search"
               placeholder="Search for a cycle, books, bag…"
@@ -118,99 +233,170 @@ export default function ProductListingPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
-            <button className={`btn btn-primary ${styles.searchBtn}`} type="submit">
+
+            <button
+              className={`btn btn-primary ${styles.searchBtn}`}
+              type="submit"
+            >
               Search
             </button>
           </form>
 
-          <div className={styles.chips} role="tablist" aria-label="Categories">
-            {CATEGORIES.map((c) => (
+          <div
+            className={styles.chips}
+            role="tablist"
+            aria-label="Categories"
+          >
+            {CATEGORIES.map((category) => (
               <button
-                key={c}
+                key={category}
                 type="button"
                 role="tab"
-                aria-selected={cat === c}
-                className={`${styles.chip} ${cat === c ? styles.chipActive : ""}`}
-                onClick={() => setCategory(c)}
+                aria-selected={cat === category}
+                className={`${styles.chip} ${
+                  cat === category ? styles.chipActive : ""
+                }`}
+                onClick={() => setCategory(category)}
               >
-                {c}
+                {category}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Header */}
         <div className={styles.head}>
           <div className={styles.headLeft}>
             <h1>
-              {q ? `Results for “${q}”` : cat !== "All" ? cat : "All products"}
+              {q
+                ? `Results for “${q}”`
+                : cat !== "All"
+                  ? cat
+                  : "All products"}
             </h1>
+
             <span className={styles.count}>
-              {results.length} {results.length === 1 ? "item" : "items"}
+              {total} {total === 1 ? "item" : "items"}
             </span>
           </div>
 
-          <label className={styles.sortWrap}>
-            <span>Sort</span>
+          <div className={styles.sortWrap}>
+            <label htmlFor="product-sort">Sort</label>
             <select
+              id="product-sort"
               className={styles.select}
               value={sort}
               onChange={(e) => setSort(e.target.value)}
             >
-              <option value="default">Relevance</option>
+              <option value="default">Latest</option>
               <option value="price-asc">Price: Low to High</option>
               <option value="price-desc">Price: High to Low</option>
             </select>
-          </label>
+
+            <label htmlFor="product-condition">Condition</label>
+            <select
+              id="product-condition"
+              className={styles.select}
+              value={condition}
+              onChange={(e) => setCondition(e.target.value)}
+            >
+              {CONDITIONS.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* Grid */}
-        {visible.length > 0 ? (
+        {loading ? (
+          <div className={styles.empty}>
+            <h2>Loading products...</h2>
+            <p>Finding available items for you.</p>
+          </div>
+        ) : error ? (
+          <div className={styles.empty}>
+            <h2>Could not load products</h2>
+            <p>{error}</p>
+            <button
+              type="button"
+              className={`btn btn-primary ${styles.emptyBtn}`}
+              onClick={() => setSearchParams(buildParams())}
+            >
+              Try Again
+            </button>
+          </div>
+        ) : products.length > 0 ? (
           <div className={styles.grid}>
-            {visible.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+              />
             ))}
           </div>
         ) : (
           <div className={styles.empty}>
             <div className={styles.emptyIcon} aria-hidden="true">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <circle cx="11" cy="11" r="7" />
                 <path d="m21 21-4.3-4.3" />
               </svg>
             </div>
+
             <h2>No items found</h2>
-            <p>Try a different keyword like “cycle”, “books” or “chair”.</p>
-            <button className={`btn btn-primary ${styles.emptyBtn}`} onClick={clearAll}>
-              Clear search
+            <p>
+              Try a different keyword or choose another category.
+            </p>
+
+            <button
+              type="button"
+              className={`btn btn-primary ${styles.emptyBtn}`}
+              onClick={clearAll}
+            >
+              Clear filters
             </button>
           </div>
         )}
 
-        {/* Pagination */}
-        {totalPages > 1 && (
+        {!loading && !error && totalPages > 1 && (
           <nav className={styles.pagination} aria-label="Pagination">
             <button
               type="button"
               className={styles.pageBtn}
-              disabled={currentPage === 1}
-              onClick={() => goToPage(currentPage - 1)}
+              disabled={page <= 1}
+              onClick={() => goToPage(page - 1)}
             >
               ← Prev
             </button>
 
-            {pageNumbers(currentPage, totalPages).map((n, i) =>
-              n === "…" ? (
-                <span key={`e${i}`} className={styles.ellipsis}>…</span>
+            {pageNumbers(page, totalPages).map((number, index) =>
+              number === "…" ? (
+                <span
+                  key={`ellipsis-${index}`}
+                  className={styles.ellipsis}
+                >
+                  …
+                </span>
               ) : (
                 <button
-                  key={n}
+                  key={number}
                   type="button"
-                  className={`${styles.pageBtn} ${n === currentPage ? styles.active : ""}`}
-                  aria-current={n === currentPage ? "page" : undefined}
-                  onClick={() => goToPage(n)}
+                  className={`${styles.pageBtn} ${
+                    number === page ? styles.active : ""
+                  }`}
+                  aria-current={number === page ? "page" : undefined}
+                  onClick={() => goToPage(number)}
                 >
-                  {n}
+                  {number}
                 </button>
               )
             )}
@@ -218,8 +404,8 @@ export default function ProductListingPage() {
             <button
               type="button"
               className={styles.pageBtn}
-              disabled={currentPage === totalPages}
-              onClick={() => goToPage(currentPage + 1)}
+              disabled={page >= totalPages}
+              onClick={() => goToPage(page + 1)}
             >
               Next →
             </button>

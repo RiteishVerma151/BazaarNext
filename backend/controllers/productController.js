@@ -281,11 +281,26 @@ export const getAllProducts = async (req, res) => {
       filter.$text = { $search: req.query.search.trim() };
     }
 
+    const sortOptions = {
+      default: { createdAt: -1 },
+      "price-asc": { price: 1 },
+      "price-desc": { price: -1 },
+    };
+
+    const sortBy = req.query.sort ?? "default";
+
+    if (!Object.hasOwn(sortOptions, sortBy)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid sort option",
+      });
+    }
+
     const skip = (page - 1) * limit;
 
     const [products, total] = await Promise.all([
       Product.find(filter)
-        .sort({ createdAt: -1 })
+        .sort(sortOptions[sortBy])
         .skip(skip)
         .limit(limit)
         .populate("seller", "name avgRating ratingCount"),
@@ -479,6 +494,25 @@ export const deleteProduct = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to remove product",
+    });
+  }
+};
+
+export const getMyProducts = async (req, res) => {
+  try {
+    const products = await Product.find({
+      seller: req.user._id,
+      status: { $ne: "REMOVED" },
+    }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      products: products.map(productResponse),
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch your listings",
     });
   }
 };

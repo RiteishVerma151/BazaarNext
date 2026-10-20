@@ -5,6 +5,7 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
+  getMyProducts,
 } from "../controllers/productController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.get("/", getAllProducts);
 router.get("/top-selling", getTopSellingProducts);
+router.get("/mine", protect, getMyProducts);
 router.get("/:id", getProductById);
 router.post("/", protect, upload.array("images", 5), createProduct);
 router.put("/:id", protect, upload.array("images", 5), updateProduct);

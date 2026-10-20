@@ -1,12 +1,26 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useApp } from "../../context/AppContext.jsx";
 import styles from "../../styles/commonComponent/Navbar.module.css";
-
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { currentUser, isAuthenticated, logout } = useApp();
+  const navigate = useNavigate();
 
   const close = () => setOpen(false);
+
+  const handleLogout = () => {
+    logout();
+    close();
+    navigate("/");
+  };
+
+  const userName =
+    currentUser?.name ||
+    currentUser?.username ||
+    currentUser?.email?.split("@")[0] ||
+    "Account";
 
   return (
     <header className={styles.navbar}>
@@ -27,25 +41,43 @@ export default function Navbar() {
             Shop
           </NavLink>
 
-          <NavLink to="/sell" onClick={close}>
-            Sell an Item
-          </NavLink>
+          {isAuthenticated && (
+            <>
+              <NavLink to="/sell" onClick={close}>
+                Sell an Item
+              </NavLink>
 
-          <NavLink to="/wishlist" onClick={close}>
-            Wishlist
-          </NavLink>
+              <NavLink to="/wishlist" onClick={close}>
+                Wishlist
+              </NavLink>
 
-          <NavLink to="/my-orders" onClick={close}>
-            My Orders
-          </NavLink>
+              <NavLink to="/my-orders" onClick={close}>
+                My Orders
+              </NavLink>
 
-          <Link
-            to="/register"
-            className={`btn btn-dark ${styles.navLogin}`}
-            onClick={close}
-          >
-            Sign In / Sign Up
-          </Link>
+              <NavLink to="/profile" onClick={close}>
+                {userName}
+              </NavLink>
+
+              <button
+                type="button"
+                className={`btn btn-dark ${styles.navLogin}`}
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </>
+          )}
+
+          {!isAuthenticated && (
+            <Link
+              to="/register"
+              className={`btn btn-dark ${styles.navLogin}`}
+              onClick={close}
+            >
+              Sign In / Sign Up
+            </Link>
+          )}
         </nav>
 
         <button
@@ -53,7 +85,7 @@ export default function Navbar() {
           className={styles.menuBtn}
           aria-label="Toggle navigation"
           aria-expanded={open}
-          onClick={() => setOpen(!open)}
+          onClick={() => setOpen((prev) => !prev)}
         >
           <span />
           <span />

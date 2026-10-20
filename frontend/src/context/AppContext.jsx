@@ -1,4 +1,3 @@
-
 import {
   createContext,
   useCallback,
@@ -9,14 +8,10 @@ import {
 } from "react";
 import api from "../lib/axios.js";
 
-
-
-
 const AppContext = createContext(null);
 
 export const useApp = () => useContext(AppContext);
 
-// Common API function: GET, POST, PUT, DELETE sab ke liye.
 async function apiRequest(endpoint, options = {}) {
   try {
     const { body, ...config } = options;
@@ -31,9 +26,9 @@ async function apiRequest(endpoint, options = {}) {
   } catch (err) {
     throw new Error(
       err.response?.data?.message ||
-      err.response?.data?.error ||
-      err.message ||
-      "Something went wrong."
+        err.response?.data?.error ||
+        err.message ||
+        "Something went wrong.",
     );
   }
 }
@@ -47,13 +42,11 @@ export function AppProvider({ children }) {
   const [productsLoading, setProductsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Backend se current logged-in user check karo.
   const checkAuth = useCallback(async () => {
     try {
-      // TODO: Apne backend ka current-user endpoint daalna.
-      const data = await apiRequest("/auth/me");
+      const data = await apiRequest("/users/me");
 
-      setCurrentUser(data.user ?? data.data?.user ?? null);
+      setCurrentUser(data.user ?? data.data?.user ?? data);
     } catch {
       setCurrentUser(null);
     } finally {
@@ -61,18 +54,16 @@ export function AppProvider({ children }) {
     }
   }, []);
 
-  // Backend se products fetch karo.
   const fetchProducts = useCallback(async () => {
     setProductsLoading(true);
     setError("");
 
     try {
-      // TODO: Apne backend ka products endpoint daalna.
       const data = await apiRequest("/products");
 
       const list = Array.isArray(data)
         ? data
-        : data.products ?? data.data?.products ?? data.data ?? [];
+        : (data.products ?? data.data?.products ?? data.data ?? []);
 
       setProducts(Array.isArray(list) ? list : []);
 
@@ -85,61 +76,59 @@ export function AppProvider({ children }) {
     }
   }, []);
 
-  // Login API.
-  const login = useCallback(async (email, password) => {
-    const data = await apiRequest("/auth/login", {
+  const login = useCallback(
+    async (email, password) => {
+      const data = await apiRequest("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const user = data.user ?? data.data?.user ?? null;
+
+      if (user) {
+        setCurrentUser(user);
+      } else {
+        await checkAuth();
+      }
+
+      return { ok: true, data };
+    },
+    [checkAuth],
+  );
+
+  const register = useCallback(async ({ name, email, password, location }) => {
+    const data = await apiRequest("/auth/register", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        ...(location ? { location } : {}),
+      }),
     });
 
     const user = data.user ?? data.data?.user ?? null;
 
     if (user) {
       setCurrentUser(user);
-    } else {
-      // Agar login response user nahi deta, /auth/me se check karo.
-      await checkAuth();
     }
 
     return { ok: true, data };
-  }, [checkAuth]);
-
-  // Registration API.
-  const register = useCallback(
-    async ({ name, email, phone, password }) => {
-      const data = await apiRequest("/auth/register", {
-        method: "POST",
-        body: JSON.stringify({ name, email, phone, password }),
-      });
-
-      // Agar backend registration ke baad user return karta hai.
-      const user = data.user ?? data.data?.user ?? null;
-
-      if (user) {
-        setCurrentUser(user);
-      }
-
-      return { ok: true, data };
-    },
-    []
-  );
-
-  // Logout API.
-  const logout = useCallback(async () => {
-    try {
-      // TODO: Backend logout route ke according update karna.
-      await apiRequest("/auth/logout", {
-        method: "POST",
-      });
-    } finally {
-      setCurrentUser(null);
-      setOrders([]);
-    }
   }, []);
 
-  // User profile backend se update karo.
+const logout = useCallback(async () => {
+  try {
+    await apiRequest("/auth/logout", {
+      method: "POST",
+    });
+  } finally {
+    setCurrentUser(null);
+    setOrders([]);
+  }
+}, []);
+
   const updateUser = useCallback(async (changes) => {
-    const data = await apiRequest("/auth/me", {
+    const data = await apiRequest("/users/me", {
       method: "PUT",
       body: JSON.stringify(changes),
     });
@@ -153,13 +142,10 @@ export function AppProvider({ children }) {
     return updatedUser;
   }, []);
 
-  // Initial load: login status aur products check karo.
   useEffect(() => {
     checkAuth();
 
-    fetchProducts().catch(() => {
-      // Error already fetchProducts mein set ho chuka hai.
-    });
+    fetchProducts().catch(() => {});
   }, [checkAuth, fetchProducts]);
 
   const value = useMemo(
@@ -195,12 +181,8 @@ export function AppProvider({ children }) {
       checkAuth,
       fetchProducts,
       updateUser,
-    ]
+    ],
   );
 
-  return (
-    <AppContext.Provider value={value}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
