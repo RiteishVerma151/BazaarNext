@@ -8,22 +8,19 @@ export const googleAuthSuccess = (req, res) => {
       );
     }
 
-    const token = jwt.sign(
-      { userId: req.user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" },
-    );
+    const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
       path: "/",
     });
 
-    return res.redirect(
-      `${process.env.FRONTEND_URL}/auth?oauth=success`,
-    );
+    return res.redirect(`${process.env.FRONTEND_URL}/auth?oauth=success`);
   } catch (error) {
     console.error("Google OAuth callback error:", error.message);
 
