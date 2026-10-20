@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 import Product from "../models/Product.js";
 
@@ -68,7 +67,7 @@ const validateProductData = (data, partial = false) => {
         (image) =>
           typeof image === "string" &&
           image.trim().length > 0 &&
-          image.length <= 2048
+          image.length <= 2048,
       )
     ) {
       errors.push("Images must be an array of up to 10 non-empty strings");
@@ -84,14 +83,16 @@ const validateProductData = (data, partial = false) => {
       coordinates.length !== 2 ||
       !coordinates.every(
         (coordinate) =>
-          typeof coordinate === "number" && Number.isFinite(coordinate)
+          typeof coordinate === "number" && Number.isFinite(coordinate),
       ) ||
       coordinates[0] < -180 ||
       coordinates[0] > 180 ||
       coordinates[1] < -90 ||
       coordinates[1] > 90
     ) {
-      errors.push("Location must contain valid longitude and latitude coordinates");
+      errors.push(
+        "Location must contain valid longitude and latitude coordinates",
+      );
     }
   }
 
@@ -125,8 +126,25 @@ export const createProduct = async (req, res) => {
       "location",
     ];
 
-    const unknownFields = Object.keys(req.body).filter(
-      (field) => !allowedFields.includes(field)
+    const productData = { ...req.body };
+
+    if (req.files?.length) {
+      productData.images = req.files.map(
+        (file) => `/uploads/products/${file.filename}`,
+      );
+    } else if (typeof productData.images === "string") {
+      try {
+        productData.images = JSON.parse(productData.images);
+      } catch {
+        return res.status(400).json({
+          success: false,
+          message: "Images must be a valid JSON array",
+        });
+      }
+    }
+
+    const unknownFields = Object.keys(productData).filter(
+      (field) => !allowedFields.includes(field),
     );
 
     if (unknownFields.length > 0) {
@@ -136,7 +154,22 @@ export const createProduct = async (req, res) => {
       });
     }
 
-    const errors = validateProductData(req.body);
+    if (productData.price !== undefined) {
+      productData.price = Number(productData.price);
+    }
+
+    if (productData.location && typeof productData.location === "string") {
+      try {
+        productData.location = JSON.parse(productData.location);
+      } catch {
+        return res.status(400).json({
+          success: false,
+          message: "Location must be valid JSON",
+        });
+      }
+    }
+
+    const errors = validateProductData(productData);
 
     if (errors.length > 0) {
       return res.status(400).json({
@@ -147,7 +180,7 @@ export const createProduct = async (req, res) => {
     }
 
     const product = await Product.create({
-      ...req.body,
+      ...productData,
       seller: req.user._id,
     });
 
@@ -207,8 +240,12 @@ export const getAllProducts = async (req, res) => {
     }
 
     if (req.query.minPrice !== undefined || req.query.maxPrice !== undefined) {
-      const minPrice = req.query.minPrice === undefined ? 0 : Number(req.query.minPrice);
-      const maxPrice = req.query.maxPrice === undefined ? Infinity : Number(req.query.maxPrice);
+      const minPrice =
+        req.query.minPrice === undefined ? 0 : Number(req.query.minPrice);
+      const maxPrice =
+        req.query.maxPrice === undefined
+          ? Infinity
+          : Number(req.query.maxPrice);
 
       if (
         !Number.isFinite(minPrice) ||
@@ -323,7 +360,24 @@ export const updateProduct = async (req, res) => {
       "location",
     ];
 
-    const fields = Object.keys(req.body);
+    const updateData = { ...req.body };
+
+    if (req.files?.length) {
+      updateData.images = req.files.map(
+        (file) => `/uploads/products/${file.filename}`,
+      );
+    } else if (typeof updateData.images === "string") {
+      try {
+        updateData.images = JSON.parse(updateData.images);
+      } catch {
+        return res.status(400).json({
+          success: false,
+          message: "Images must be a valid JSON array",
+        });
+      }
+    }
+
+    const fields = Object.keys(updateData);
 
     if (
       fields.length === 0 ||
@@ -335,7 +389,22 @@ export const updateProduct = async (req, res) => {
       });
     }
 
-    const errors = validateProductData(req.body, true);
+    if (updateData.price !== undefined) {
+      updateData.price = Number(updateData.price);
+    }
+
+    if (updateData.location && typeof updateData.location === "string") {
+      try {
+        updateData.location = JSON.parse(updateData.location);
+      } catch {
+        return res.status(400).json({
+          success: false,
+          message: "Location must be valid JSON",
+        });
+      }
+    }
+
+    const errors = validateProductData(updateData, true);
 
     if (errors.length > 0) {
       return res.status(400).json({
@@ -359,7 +428,7 @@ export const updateProduct = async (req, res) => {
     }
 
     for (const field of fields) {
-      product[field] = req.body[field];
+      product[field] = updateData[field];
     }
 
     await product.save();

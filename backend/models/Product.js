@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
@@ -71,10 +70,15 @@ const productSchema = new mongoose.Schema(
         type: [Number],
       },
     },
+    soldCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 productSchema.index({ title: "text", description: "text" });
