@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../../lib/axios.js";
 
+import Navbar from "../../components/commoncomponents/Navbar";
 import Footer from "../../components/commoncomponents/Footer.jsx";
 import ProductGallery from "../../components/productDetail/ProductGallery.jsx";
 import ProductHeader from "../../components/productDetail/ProductHeader.jsx";
