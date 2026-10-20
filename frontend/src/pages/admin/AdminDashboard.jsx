@@ -24,7 +24,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "../../styles/admin/admin.module.css";
 
-const API_URL = "http://localhost:3001/api";
+const API_URL = "https://bazaarnext.onrender.com/api";
 
 const api = axios.create({
   baseURL: API_URL,

@@ -23,7 +23,7 @@ export default function ProductCard({ product }) {
   const image = imageValue
     ? imageValue.startsWith("http")
       ? imageValue
-      : `http://localhost:3001${
+      : `https://bazaarnext.onrender.com${
           imageValue.startsWith("/") ? "" : "/"
         }${imageValue}`
     : null;

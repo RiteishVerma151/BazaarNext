@@ -23,7 +23,7 @@ const getImageUrl = (image) => {
   if (!image) return "";
   if (/^https?:\/\//i.test(image)) return image;
 
-  const baseURL = api.defaults.baseURL || "http://localhost:3001/api";
+  const baseURL = api.defaults.baseURL || "https://bazaarnext.onrender.com/api";
   const serverURL = baseURL.replace(/\/api\/?$/, "");
 
   return `${serverURL}/${image.replace(/^\/+/, "")}`;

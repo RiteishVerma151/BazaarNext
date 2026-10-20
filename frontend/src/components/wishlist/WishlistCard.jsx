@@ -9,7 +9,7 @@ const getImageUrl = (path) => {
     return path;
   }
 
-  return `http://localhost:3001${path.startsWith("/") ? "" : "/"}${path}`;
+  return `https://bazaarnext.onrender.com${path.startsWith("/") ? "" : "/"}${path}`;
 };
 
 export default function WishlistCard({ item, onRemove }) {

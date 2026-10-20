@@ -8,7 +8,7 @@ const getImageUrl = (path) => {
 
   if (/^https?:\/\//i.test(path)) return path;
 
-  const baseURL = "http://localhost:3001";
+  const baseURL = "https://bazaarnext.onrender.com";
   return `${baseURL}${path.startsWith("/") ? "" : "/"}${path}`;
 };
 
