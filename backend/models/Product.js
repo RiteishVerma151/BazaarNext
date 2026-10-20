@@ -79,7 +79,6 @@ const productSchema = new mongoose.Schema(
 );
 
 productSchema.index({ title: "text", description: "text" });
-productSchema.index({ location: "2dsphere" });
 
 const Product = mongoose.model("Product", productSchema);
 
