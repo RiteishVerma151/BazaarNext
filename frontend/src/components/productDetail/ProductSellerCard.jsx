@@ -8,7 +8,6 @@ export default function ProductSellerCard() {
         <h4>Rahul S.</h4>
         <p>⭐ 4.8 • Joined March 2023</p>
       </div>
-      <button className={styles.viewProfileBtn}>View Profile</button>
     </div>
   );
 }

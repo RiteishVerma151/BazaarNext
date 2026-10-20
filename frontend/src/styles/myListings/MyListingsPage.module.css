@@ -1,0 +1,138 @@
+.page {
+  background-color: #f4f6f8;
+  padding-top: 40px;
+  padding-bottom: 80px;
+  min-height: 100vh;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header h1 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: #1a2b4c;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.5px;
+}
+
+.header p {
+  color: #6b7280;
+  font-size: 15px;
+  margin: 0;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5a623;
+  color: #1a2b4c;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.addBtn:hover {
+  background: #e0961e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
+}
+
+/* Tabs */
+.tabsWrap {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.tabsWrap::-webkit-scrollbar { display: none; }
+
+.tabBtn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #1a2b4c;
+  font: 600 13px "DM Sans", sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.tabBtn:hover { border-color: #1a2b4c; }
+
+.activeTab {
+  background: #1a2b4c;
+  color: #fff;
+  border-color: #1a2b4c;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+/* Empty State */
+.emptyState {
+  background: #fff;
+  border: 1px dashed #e5e7eb;
+  border-radius: 20px;
+  padding: 60px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.emptyIcon { color: #d1d5db; margin-bottom: 16px; }
+.emptyState h2 { font-family: "Bricolage Grotesque", sans-serif; font-size: 22px; color: #1a2b4c; margin-bottom: 8px; }
+.emptyState p { color: #6b7280; font-size: 15px; margin-bottom: 24px; }
+.emptyShopBtn {
+  background: #1a2b4c;
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.emptyShopBtn:hover { background: #111e35; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .page { padding-top: 24px; }
+  .header h1 { font-size: 24px; }
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .addBtn { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 380px) {
+  .grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,26 @@
+.box { border-top: 1px solid var(--line); background: var(--card); padding: 12px 14px; display: grid; gap: 10px; }
+.form { display: flex; gap: 8px; align-items: center; }
+.form input { flex: 1; min-width: 0; font: 500 15px "DM Sans", sans-serif; padding: 11px 12px; border: 1.5px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); }
+.form input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(15, 122, 107, 0.2); }
+.rupee { font-weight: 800; font-size: 18px; }
+
+.send, .ghost { border: 0; cursor: pointer; font: 700 14px "DM Sans", sans-serif; padding: 11px 14px; border-radius: 10px; white-space: nowrap; }
+.send { background: var(--accent); color: var(--accent-ink); }
+.send:hover { background: #ffb91f; }
+.ghost { background: transparent; border: 1.5px solid var(--ink); color: var(--ink); }
+.ghost:hover:not(:disabled) { background: var(--ink); color: #fff; }
+.ghost:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.quick { display: flex; gap: 8px; flex-wrap: wrap; }
+.quick button { background: var(--bg); border: 1px solid var(--line); border-radius: 99px; padding: 6px 12px; font: 500 13px "DM Sans", sans-serif; color: var(--ink); cursor: pointer; }
+.quick button:hover { border-color: var(--ink); }
+
+.notice { background: #e8f5f2; color: #0b5a4f; border: 1px solid #bfe3db; padding: 9px 12px; border-radius: 10px; font-size: 14px; }
+.error { background: #fdeaea; color: #9b1c1c; border: 1px solid #f5c2c2; padding: 9px 12px; border-radius: 10px; font-size: 14px; }
+
+@media (max-width: 560px) {
+  .form { flex-wrap: wrap; }
+  .form input { flex: 1 1 100%; }
+  .form .send { flex: 1; }
+  .form .ghost { flex: 1; }
+}

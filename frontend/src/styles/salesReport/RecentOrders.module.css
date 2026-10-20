@@ -1,0 +1,143 @@
+.ordersCard {
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 20px;
+  padding: 22px;
+  margin-bottom: 24px;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+.cardHeader h2 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink, #1a2b4c);
+  margin: 0 0 3px 0;
+}
+.cardHeader p {
+  font-size: 12px;
+  color: var(--muted, #6b7280);
+  margin: 0;
+}
+.viewAll {
+  color: var(--success, #0f7a6b);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.viewAll:hover { text-decoration: underline; }
+
+.tableWrap {
+  overflow-x: auto;
+  margin: 0 -8px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+.table thead th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line, #e5e7eb);
+}
+.table tbody td {
+  padding: 14px 8px;
+  font-size: 13px;
+  color: var(--ink, #1a2b4c);
+  border-bottom: 1px solid var(--line, #e5e7eb);
+}
+.table tbody tr:last-child td { border-bottom: none; }
+.table tbody tr:hover { background: var(--bg, #f8f9fa); }
+
+.orderId { font-weight: 700; color: var(--ink, #1a2b4c); font-size: 12px; }
+.itemName {
+  color: var(--muted, #6b7280);
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.amount { font-weight: 700; color: var(--success, #0f7a6b); }
+.date { color: var(--muted, #6b7280); font-size: 12px; }
+
+.statusPill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.statusDelivered { background: var(--success-bg, #e6f7f0); color: var(--success, #0f7a6b); }
+.statusShipped { background: var(--info-bg, #dbeafe); color: var(--info, #1e40af); }
+.statusProcessing { background: var(--warning-bg, #fff7ed); color: var(--warning, #c2410c); }
+
+/* ==========================================
+   MOBILE — TABLE → CARD LAYOUT
+   ========================================== */
+@media (max-width: 700px) {
+  .ordersCard { padding: 16px; border-radius: 16px; }
+
+  .tableWrap { overflow-x: visible; margin: 0; }
+  .table { min-width: 0; width: 100%; }
+  
+  /* Header hide */
+  .table thead { display: none; }
+  
+  /* Sab block */
+  .table,
+  .table tbody,
+  .table tr,
+  .table td { display: block; width: 100%; }
+  
+  /* Har row ek card */
+  .table tbody tr {
+    background: var(--bg, #f8f9fa);
+    border: 1px solid var(--line, #e5e7eb);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .table tbody tr:last-child { margin-bottom: 0; }
+  .table tbody tr:hover { background: var(--bg, #f8f9fa); }
+  
+  /* Har cell ek line */
+  .table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border: none;
+    font-size: 13px;
+    gap: 12px;
+  }
+  
+  /* Label from data-label */
+  .table tbody td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted, #6b7280);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+  }
+  
+  .orderId { font-size: 13px; }
+  .itemName { max-width: none; white-space: normal; text-align: right; }
+  .statusPill { font-size: 11px; }
+  .date { font-size: 12px; }
+}

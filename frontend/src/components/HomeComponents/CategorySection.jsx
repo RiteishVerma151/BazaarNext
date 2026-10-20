@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { categories } from "../../data/products.js";
 import "../../styles/home/CategorySection.css";
 
@@ -8,10 +9,10 @@ export default function CategorySection() {
         <div className="section-head"><h2>Shop by category</h2></div>
         <div className="cats">
           {categories.map((c) => (
-            <a key={c.id} className="cat" href="#">
+            <Link key={c.id} className="cat" to={`/products?cat=${encodeURIComponent(c.name)}`}>
               {c.name}
               <small>{c.hint}</small>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

@@ -1,0 +1,182 @@
+.topCard {
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 20px;
+  padding: 22px;
+  min-width: 0;          /* 👈 Important */
+  overflow: hidden;      /* 👈 Card ke bahar kuch na jaye */
+  max-width: 100%;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+.cardHeader h2 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink, #1a2b4c);
+  margin: 0 0 3px 0;
+}
+.cardHeader p {
+  font-size: 12px;
+  color: var(--muted, #6b7280);
+  margin: 0;
+}
+.viewAll {
+  color: var(--success, #0f7a6b);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.viewAll:hover { text-decoration: underline; }
+
+/* 👇 Scroll wrapper — card ke andar scroll */
+.topScroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line, #e5e7eb) transparent;
+  padding-bottom: 6px;
+  margin-bottom: -6px;
+}
+.topScroll::-webkit-scrollbar {
+  height: 6px;
+}
+.topScroll::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+.topScroll::-webkit-scrollbar-thumb {
+  background: var(--line, #e5e7eb);
+  border-radius: 3px;
+}
+.topScroll::-webkit-scrollbar-thumb:hover {
+  background: var(--muted, #9ca3af);
+}
+
+.topList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;           /* 👈 Default */
+}
+
+.topItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+.topRank {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted, #9ca3af);
+  min-width: 22px;
+}
+.topImg {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex: none;
+  border: 1px solid var(--line, #f3f4f6);
+}
+.topInfo { flex: 1; min-width: 0; }
+.topName {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink, #1a2b4c);
+  margin: 0 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topMeta {
+  font-size: 11px;
+  color: var(--muted, #9ca3af);
+  margin: 0;
+}
+.topRevenue {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--success, #0f7a6b);
+  white-space: nowrap;
+  flex: none;
+}
+
+/* ==========================================
+   MOBILE — Horizontal cards, card ke andar scroll
+   ========================================== */
+@media (max-width: 600px) {
+  .topCard { padding: 16px; border-radius: 16px; }
+  .cardHeader h2 { font-size: 15px; }
+  .cardHeader p { font-size: 11px; }
+  .viewAll { font-size: 11px; }
+
+  /* 👇 List horizontal, par width max-content — scroll hoga andar */
+  .topList {
+    flex-direction: row;
+    gap: 10px;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .topItem {
+    flex: 0 0 180px;
+    width: 180px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 10px;
+    border: 1px solid var(--line, #e5e7eb);
+    border-radius: 12px;
+    background: var(--bg, #f8f9fa);
+    position: relative;
+  }
+
+  .topRank {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 10px;
+    min-width: auto;
+    background: var(--warning, #f5a623);
+    color: var(--ink, #1a2b4c);
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+
+  .topImg {
+    width: 100%;
+    height: 80px;
+    border-radius: 8px;
+  }
+  .topInfo {
+    width: 100%;
+    flex: none;
+  }
+  .topName {
+    font-size: 12px;
+    white-space: normal;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.6em;
+  }
+  .topMeta { font-size: 10px; }
+  .topRevenue {
+    font-size: 13px;
+    width: 100%;
+    margin-top: 4px;
+  }
+}

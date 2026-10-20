@@ -1,0 +1,74 @@
+.kpiCard {
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: box-shadow 0.2s;
+}
+.kpiCard:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.kpiIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+/* Color variants */
+.success { background: var(--success-bg, #e6f7f0); color: var(--success, #0f7a6b); }
+.info    { background: var(--info-bg, #eff6ff);    color: var(--info, #2563eb); }
+.warning { background: var(--warning-bg, #fef3c7); color: var(--warning, #92400e); }
+.purple  { background: #f3e8ff;                    color: #7c3aed; }
+
+.kpiInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.kpiLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.kpiValue {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink, #1a2b4c);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.kpiChange {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+.positive { color: var(--success, #0f7a6b); }
+.negative { color: var(--danger, #dc2626); }
+
+.kpiHint {
+  font-size: 11px;
+  color: var(--muted, #9ca3af);
+  margin-top: 2px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .kpiCard { padding: 14px; }
+  .kpiValue { font-size: 19px; }
+}

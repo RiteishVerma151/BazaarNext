@@ -1,0 +1,77 @@
+/* Add to Cart Button */
+.cartBtn {
+  width: 100%;
+  background: #f5a623;
+  color: #1a2b4c;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.cartBtn:hover {
+  background: #e0961e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(245, 166, 35, 0.3);
+}
+
+/* Toast Popup */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #0f7a6b;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a2b4c;
+  z-index: 9999;
+  animation: slideInRight 0.3s ease;
+}
+
+.toastLink {
+  color: #0f7a6b;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.toastLink:hover {
+  text-decoration: underline;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .cartBtn {
+    font-size: 12px;
+    padding: 8px;
+  }
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    font-size: 13px;
+  }
+}
