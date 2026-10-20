@@ -10,7 +10,7 @@ import ProductActions from "../../components/productDetail/ProductActions.jsx";
 import ProductSellerCard from "../../components/productDetail/ProductSellerCard.jsx";
 import ProductTabs from "../../components/productDetail/ProductTabs.jsx";
 import styles from "../../styles/ProductDetail/ProductDetailPage.module.css";
-import extras from "../productDetail/ProductExtras.module.css";
+import extras from "./ProductExtras.module.css";
 
 const CATEGORY_COLORS = {
   Electronics: "#2B6CB0",

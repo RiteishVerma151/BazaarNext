@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import Navbar from "../../components/commoncomponents/Navbar.jsx";
 import Footer from "../../components/commoncomponents/Footer.jsx";
 import api from "../../lib/axios.js";
-import styles from "../seller/SellerDashboard.module.css";
+import styles from "./SellerDashboard.module.css";
 
 const money = (value) =>
   `₹${Number(value || 0).toLocaleString("en-IN", {

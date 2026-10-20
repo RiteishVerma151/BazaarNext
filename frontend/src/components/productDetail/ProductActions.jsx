@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../lib/axios.js";
-import styles from "../../styles/productDetail/ProductActions.module.css";
+import styles from "../../styles/ProductDetail/ProductActions.module.css";
 
 export default function ProductActions({ productId, product }) {
   const navigate = useNavigate();

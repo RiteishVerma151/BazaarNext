@@ -1,4 +1,4 @@
-import styles from "../../styles/productDetail/ProductHeader.module.css";
+import styles from "../../styles/ProductDetail/ProductHeader.module.css";
 
 export default function ProductHeader({ name, location, price }) {
   return (
