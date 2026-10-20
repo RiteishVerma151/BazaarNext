@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 import { useApp } from "../../context/AppContext.jsx";
-import styles from "../../styles/commoncomponent/Navbar.module.css";
+import styles from "../../styles/commonComponent/Navbar.module.css";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
