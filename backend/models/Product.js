@@ -62,13 +62,10 @@ const productSchema = new mongoose.Schema(
       index: true,
     },
     location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-      },
-      coordinates: {
-        type: [Number],
-      },
+      type: String,
+      trim: true,
+      maxlength: 150,
+      default: "",
     },
     soldCount: {
       type: Number,

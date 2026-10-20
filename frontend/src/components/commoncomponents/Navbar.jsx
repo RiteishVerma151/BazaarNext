@@ -43,7 +43,7 @@ export default function Navbar() {
     { label: "Wishlist", path: "/wishlist", icon: Heart },
     { label: "My Listings", path: "/my-listings", icon: Store },
     { label: "Sell an Item", path: "/sell", icon: ShoppingBag },
-    { label: "Sales Report", path: "/sales-report", icon: FileText },
+    { label: "Sellers Dashboard", path: "/seller/dashboard", icon: FileText },
     { label: "Offers Sent", path: "/my-offers", icon: Send },
     { label: "Offers Received", path: "/offers", icon: Inbox },
     ...(isAdmin

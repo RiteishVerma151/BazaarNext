@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Product from "../models/Product.js";
+import User from "../models/User.js";
 
 const categories = [
   "Electronics",
@@ -75,24 +76,8 @@ const validateProductData = (data, partial = false) => {
   }
 
   if (data.location !== undefined) {
-    const coordinates = data.location?.coordinates;
-
-    if (
-      data.location?.type !== "Point" ||
-      !Array.isArray(coordinates) ||
-      coordinates.length !== 2 ||
-      !coordinates.every(
-        (coordinate) =>
-          typeof coordinate === "number" && Number.isFinite(coordinate),
-      ) ||
-      coordinates[0] < -180 ||
-      coordinates[0] > 180 ||
-      coordinates[1] < -90 ||
-      coordinates[1] > 90
-    ) {
-      errors.push(
-        "Location must contain valid longitude and latitude coordinates",
-      );
+    if (typeof data.location !== "string" || data.location.length > 150) {
+      errors.push("Location must be a string of up to 150 characters");
     }
   }
 
@@ -129,9 +114,7 @@ export const createProduct = async (req, res) => {
     const productData = { ...req.body };
 
     if (req.files?.length) {
-      productData.images = req.files.map(
-        (file) => `/uploads/products/${file.filename}`,
-      );
+      productData.images = req.files.map((file) => file.path);
     } else if (typeof productData.images === "string") {
       try {
         productData.images = JSON.parse(productData.images);
@@ -158,17 +141,6 @@ export const createProduct = async (req, res) => {
       productData.price = Number(productData.price);
     }
 
-    if (productData.location && typeof productData.location === "string") {
-      try {
-        productData.location = JSON.parse(productData.location);
-      } catch {
-        return res.status(400).json({
-          success: false,
-          message: "Location must be valid JSON",
-        });
-      }
-    }
-
     const errors = validateProductData(productData);
 
     if (errors.length > 0) {
@@ -179,9 +151,30 @@ export const createProduct = async (req, res) => {
       });
     }
 
+    const sellerId = req.user?._id ?? req.user?.id ?? req.user?.userId;
+
+    if (!sellerId) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+    }
+
+    const seller = await User.findById(sellerId).select("location");
+
+    if (!seller) {
+      return res.status(404).json({
+        success: false,
+        message: "Seller not found",
+      });
+    }
+
+    const { location: ignoredLocation, ...restProductData } = productData;
+
     const product = await Product.create({
-      ...productData,
-      seller: req.user._id,
+      ...restProductData,
+      seller: seller._id,
+      location: seller.location || "",
     });
 
     return res.status(201).json({
@@ -378,9 +371,7 @@ export const updateProduct = async (req, res) => {
     const updateData = { ...req.body };
 
     if (req.files?.length) {
-      updateData.images = req.files.map(
-        (file) => `/uploads/products/${file.filename}`,
-      );
+      updateData.images = req.files.map((file) => file.path);
     } else if (typeof updateData.images === "string") {
       try {
         updateData.images = JSON.parse(updateData.images);
@@ -406,17 +397,6 @@ export const updateProduct = async (req, res) => {
 
     if (updateData.price !== undefined) {
       updateData.price = Number(updateData.price);
-    }
-
-    if (updateData.location && typeof updateData.location === "string") {
-      try {
-        updateData.location = JSON.parse(updateData.location);
-      } catch {
-        return res.status(400).json({
-          success: false,
-          message: "Location must be valid JSON",
-        });
-      }
     }
 
     const errors = validateProductData(updateData, true);
