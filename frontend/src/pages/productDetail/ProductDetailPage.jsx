@@ -10,7 +10,7 @@ import ProductHeader from "../../components/productDetail/ProductHeader.jsx";
 import ProductActions from "../../components/productDetail/ProductActions.jsx";
 import ProductSellerCard from "../../components/productDetail/ProductSellerCard.jsx";
 import ProductTabs from "../../components/productDetail/ProductTabs.jsx";
-import styles from "../../styles/productDetail/ProductDetailPage.module.css";
+import styles from "../../styles/ProductDetail/ProductDetailPage.module.css";
 import extras from "../productDetail/ProductExtras.module.css";
 
 const CATEGORY_COLORS = {
