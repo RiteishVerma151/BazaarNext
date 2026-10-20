@@ -1,18 +1,445 @@
-.navbar { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
-.navbarRow { display: flex; align-items: center; height: 64px; gap: 18px; position: relative; }
-.logo { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
-.logo span { color: var(--teal); }
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid #e8eaf0;
+  box-shadow: 0 3px 14px rgba(15, 23, 42, 0.04);
+}
 
-.navLinks { display: flex; align-items: center; gap: 6px; margin-left: auto; }
-.navLinks a:not(:global(.btn)) { padding: 8px 12px; border-radius: 8px; font-weight: 500; font-size: 15px; }
-.navLinks a:not(:global(.btn)):hover { background: var(--bg); }
+.navbarInner {
+  width: min(1200px, 100%);
+  min-height: 76px;
+  margin: 0 auto;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+}
 
-.menuBtn { display: none; margin-left: auto; background: none; border: 1px solid var(--line); border-radius: 8px; width: 42px; height: 42px; cursor: pointer; flex-direction: column; justify-content: center; align-items: center; gap: 4px; }
-.menuBtn span { width: 18px; height: 2px; background: var(--ink); display: block; }
+.logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: #16213a;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  text-decoration: none;
+}
 
-@media (max-width: 820px) {
-  .menuBtn { display: flex; }
-  .navLinks { display: none; position: absolute; top: 64px; left: 0; right: 0; background: var(--card); border-bottom: 1px solid var(--line); flex-direction: column; align-items: stretch; padding: 12px 20px 18px; margin: 0; gap: 4px; }
-  .navLinks.open { display: flex; }
-  .navLinks .navLogin { text-align: center; margin-top: 8px; }
+.logoIcon {
+  display: none;
+}
+
+.logoAccent {
+  color: #16213a;
+}
+
+.mainLinks {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-left: auto;
+  margin-right: 42px;
+}
+
+.navLink,
+.activeLink {
+  position: relative;
+  padding: 9px 0;
+  color: #667085;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.navLink:hover,
+.activeLink {
+  color: #16213a;
+}
+
+.activeLink::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  content: "";
+  background: #16213a;
+  border-radius: 5px;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 22px;
+  flex-shrink: 0;
+}
+
+.userInfo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: #27324a;
+  text-decoration: none;
+}
+
+.avatar,
+.avatarLarge {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  color: #ffffff;
+  font-weight: 800;
+  background: #16213a;
+  box-shadow: 0 4px 10px rgba(22, 33, 58, 0.2);
+  border-radius: 50%;
+}
+
+.avatar {
+  width: 39px;
+  height: 39px;
+  font-size: 16px;
+}
+
+.userName {
+  max-width: 150px;
+  overflow: hidden;
+  color: #344054;
+  font-size: 14px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userInfo:hover .userName {
+  color: #16213a;
+}
+
+.signIn {
+  padding: 10px 18px;
+  color: #ffffff;
+  background: #16213a;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.signIn:hover {
+  background: #25355a;
+  transform: translateY(-1px);
+}
+
+.menuButton {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  color: #344054;
+  background: #f4f5fb;
+  border: 1px solid #e5e7f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.menuButton:hover,
+.menuButtonActive {
+  color: #ffffff;
+  background: #16213a;
+  border-color: #16213a;
+}
+
+.menuOverlay {
+  position: fixed;
+  z-index: 1001;
+  inset: 76px 0 0;
+  width: 100%;
+  height: calc(100vh - 76px);
+  padding: 0;
+  background: rgba(15, 23, 42, 0.25);
+  border: none;
+  cursor: default;
+}
+
+.dropdown {
+  position: absolute;
+  z-index: 1002;
+  top: calc(100% + 10px);
+  right: max(20px, calc((100vw - 1200px) / 2 + 28px));
+  width: 310px;
+  max-height: min(75vh, 650px);
+  padding: 14px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e8eaf0;
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.16);
+  animation: menuAppear 0.18s ease-out;
+}
+
+@keyframes menuAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px 16px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.avatarLarge {
+  width: 45px;
+  height: 45px;
+  font-size: 19px;
+}
+
+.userDetails {
+  min-width: 0;
+}
+
+.dropdownName {
+  margin: 0;
+  overflow: hidden;
+  color: #1d2939;
+  font-size: 15px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdownEmail {
+  margin: 4px 0 0;
+  overflow: hidden;
+  color: #98a2b3;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuLabel {
+  margin: 15px 10px 8px;
+  color: #98a2b3;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.menuLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menuLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 43px;
+  padding: 11px 12px;
+  color: #475467;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.18s ease, background 0.18s ease;
+}
+
+.menuLink svg,
+.logoutButton svg {
+  flex-shrink: 0;
+}
+
+.menuLink:hover {
+  color: #16213a;
+  background: #f4f5fb;
+}
+
+.menuLinkActive {
+  color: #16213a;
+  background: #e8eaf0;
+}
+
+.menuDivider {
+  height: 1px;
+  margin: 8px 4px;
+  background: #edf0f5;
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 43px;
+  padding: 11px 12px;
+  color: #e04444;
+  background: #fff5f5;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.logoutButton:hover {
+  background: #ffe5e5;
+}
+
+.createAccount {
+  display: block;
+  margin-top: 5px;
+  padding: 12px;
+  color: #ffffff;
+  background: #16213a;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.createAccount:hover {
+  background: #25355a;
+}
+
+@media (max-width: 650px) {
+  .navbarInner {
+    min-height: 68px;
+    padding: 0 16px;
+  }
+
+  .logo {
+    font-size: 21px;
+  }
+
+  .mainLinks {
+    gap: 18px;
+    margin-right: 18px;
+  }
+
+  .navLink,
+  .activeLink {
+    font-size: 14px;
+  }
+
+  .rightSection {
+    gap: 12px;
+  }
+
+  .userName {
+    max-width: 90px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .menuButton {
+    width: 41px;
+    height: 41px;
+  }
+
+  .menuOverlay {
+    top: 68px;
+    height: calc(100vh - 68px);
+  }
+
+  .dropdown {
+    right: 12px;
+    width: min(310px, calc(100vw - 24px));
+  }
+}
+
+@media (max-width: 420px) {
+  .navbarInner {
+    padding: 0 11px;
+  }
+
+  .logo {
+    font-size: 19px;
+  }
+
+  .mainLinks {
+    gap: 12px;
+    margin-right: 12px;
+  }
+
+  .navLink,
+  .activeLink {
+    font-size: 13px;
+  }
+
+  .rightSection {
+    gap: 8px;
+  }
+
+  .userInfo {
+    gap: 6px;
+  }
+
+  .userName {
+    max-width: 65px;
+    font-size: 12px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .menuButton {
+    width: 37px;
+    height: 37px;
+    border-radius: 10px;
+  }
+
+  .signIn {
+    padding: 9px 11px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 350px) {
+  .mainLinks {
+    gap: 8px;
+    margin-right: 8px;
+  }
+
+  .logo {
+    font-size: 17px;
+  }
+
+  .userName {
+    display: none;
+  }
 }

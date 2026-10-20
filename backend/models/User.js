@@ -36,28 +36,10 @@ const userSchema = new mongoose.Schema(
     },
 
     location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-      },
-      coordinates: {
-        type: [Number],
-        validate: {
-          validator: function (coordinates) {
-            if (coordinates == null) return true;
-
-            return (
-              coordinates.length === 2 &&
-              coordinates.every(Number.isFinite) &&
-              coordinates[0] >= -180 &&
-              coordinates[0] <= 180 &&
-              coordinates[1] >= -90 &&
-              coordinates[1] <= 90
-            );
-          },
-          message: "Coordinates must be [longitude, latitude]",
-        },
-      },
+      type: String,
+      trim: true,
+      maxlength: 150,
+      default: "",
     },
 
     avgRating: {

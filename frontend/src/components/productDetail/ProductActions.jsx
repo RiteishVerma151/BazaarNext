@@ -1,14 +1,12 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
 import api from "../../lib/axios.js";
 import styles from "../../styles/productDetail/ProductActions.module.css";
 
 export default function ProductActions({ productId, product }) {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
 
-  const [toast, setToast] = useState(false);
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [offerPrice, setOfferPrice] = useState("");
   const [message, setMessage] = useState("");
@@ -17,24 +15,12 @@ export default function ProductActions({ productId, product }) {
   const [offerSuccess, setOfferSuccess] = useState("");
 
   const handleBuyNow = () => {
-    if (!product) {
+    if (!product || !productId) {
       alert("Product data missing");
       return;
     }
 
-    addToCart(product);
-    navigate("/checkout");
-  };
-
-  const handleAddToCart = () => {
-    if (!product) {
-      alert("Product data missing");
-      return;
-    }
-
-    addToCart(product);
-    setToast(true);
-    setTimeout(() => setToast(false), 2500);
+    navigate(`/checkout/${productId}`);
   };
 
   const handleOfferSubmit = async (event) => {
@@ -92,12 +78,12 @@ export default function ProductActions({ productId, product }) {
   return (
     <>
       <div className={styles.actions}>
-        <button className={styles.buyBtn} onClick={handleBuyNow}>
+        <button
+          type="button"
+          className={styles.buyBtn}
+          onClick={handleBuyNow}
+        >
           Buy Now
-        </button>
-
-        <button className={styles.offerBtn} onClick={handleAddToCart}>
-          Add to Cart
         </button>
 
         <button
@@ -128,7 +114,8 @@ export default function ProductActions({ productId, product }) {
           <h3 style={{ margin: 0 }}>Make an Offer</h3>
 
           <p style={{ margin: 0, color: "#64748b", fontSize: 14 }}>
-            Listed price: ₹{Number(product.price).toLocaleString("en-IN")}
+            Listed price: ₹
+            {Number(product.price).toLocaleString("en-IN")}
           </p>
 
           <label htmlFor="offerPrice">Your offer price (₹)</label>
@@ -177,13 +164,9 @@ export default function ProductActions({ productId, product }) {
 
           {offerError && (
             <p role="alert" style={{ color: "#dc2626", margin: 0 }}>
-              {offerError}
-              {(offerError.includes("log in") ||
-                offerError.includes("log in")) && (
-                <>
-                  {" "}
-                  <Link to="/login">Log in</Link>
-                </>
+              {offerError}{" "}
+              {offerError.includes("log in") && (
+                <Link to="/login">Log in</Link>
               )}
             </p>
           )}
@@ -219,15 +202,6 @@ export default function ProductActions({ productId, product }) {
         </svg>
         Always meet in a public place and inspect the item before paying.
       </p>
-
-      {toast && (
-        <div className={styles.toast}>
-          <span>✅ Added to cart</span>
-          <Link to="/cart" className={styles.toastLink}>
-            View Cart →
-          </Link>
-        </div>
-      )}
     </>
   );
 }

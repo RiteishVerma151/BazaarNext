@@ -1,22 +1,36 @@
+
 import User from "../models/User.js";
+
+const formatUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  location: user.location || "",
+  avgRating: user.avgRating,
+  ratingCount: user.ratingCount,
+  createdAt: user.createdAt,
+});
 
 export const getMyProfile = async (req, res) => {
   try {
-    res.status(200).json({
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
       success: true,
-      user: {
-        id: req.user._id,
-        name: req.user.name,
-        email: req.user.email,
-        role: req.user.role,
-        location: req.user.location,
-        avgRating: req.user.avgRating,
-        ratingCount: req.user.ratingCount,
-        createdAt: req.user.createdAt,
-      },
+      user: formatUser(user),
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Get profile error:", error);
+
+    return res.status(500).json({
       success: false,
       message: "Failed to fetch profile",
     });
@@ -29,7 +43,11 @@ export const updateMyProfile = async (req, res) => {
     const updates = {};
 
     if (name !== undefined) {
-      if (typeof name !== "string" || name.trim().length < 2 || name.trim().length > 50) {
+      if (
+        typeof name !== "string" ||
+        name.trim().length < 2 ||
+        name.trim().length > 50
+      ) {
         return res.status(400).json({
           success: false,
           message: "Name must be between 2 and 50 characters",
@@ -40,35 +58,17 @@ export const updateMyProfile = async (req, res) => {
     }
 
     if (location !== undefined) {
-      if (location === null) {
-        updates.location = undefined;
-      } else {
-        const coordinates = location?.coordinates;
-
-        if (
-          location?.type !== "Point" ||
-          !Array.isArray(coordinates) ||
-          coordinates.length !== 2 ||
-          !coordinates.every(
-            (coordinate) =>
-              typeof coordinate === "number" && Number.isFinite(coordinate)
-          ) ||
-          coordinates[0] < -180 ||
-          coordinates[0] > 180 ||
-          coordinates[1] < -90 ||
-          coordinates[1] > 90
-        ) {
-          return res.status(400).json({
-            success: false,
-            message: "Location must contain valid longitude and latitude coordinates",
-          });
-        }
-
-        updates.location = {
-          type: "Point",
-          coordinates,
-        };
+      if (
+        typeof location !== "string" ||
+        location.trim().length > 150
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Location must be a text value of up to 150 characters",
+        });
       }
+
+      updates.location = location.trim();
     }
 
     if (Object.keys(updates).length === 0) {
@@ -87,22 +87,22 @@ export const updateMyProfile = async (req, res) => {
       }
     );
 
-    res.status(200).json({
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        location: user.location,
-        avgRating: user.avgRating,
-        ratingCount: user.ratingCount,
-        createdAt: user.createdAt,
-      },
+      user: formatUser(user),
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Update profile error:", error);
+
+    return res.status(500).json({
       success: false,
       message: "Failed to update profile",
     });

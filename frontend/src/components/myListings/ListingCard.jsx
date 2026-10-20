@@ -1,4 +1,6 @@
+
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import styles from "../../styles/myListings/ListingCard.module.css";
 
 const getImageUrl = (path) => {
@@ -14,8 +16,66 @@ export default function ListingCard({ listing, onDelete }) {
   const id = listing.id ?? listing._id;
   const image = listing.images?.[0] ?? listing.image;
   const status = listing.status === "AVAILABLE" ? "Active" : "Sold";
+
   const condition =
     listing.condition === "Like New" ? "Like new" : listing.condition;
+
+  const handleDelete = () => {
+    toast(
+      (t) => (
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <span style={{ fontWeight: 600 }}>
+            Delete "{listing.title}"?
+          </span>
+
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button
+              type="button"
+              onClick={async () => {
+                toast.dismiss(t.id);
+
+                try {
+                  await onDelete(id);
+                  toast.success("Listing deleted successfully!");
+                } catch (error) {
+                  toast.error(
+                    error?.response?.data?.message ||
+                      "Failed to delete listing."
+                  );
+                }
+              }}
+              style={{
+                padding: "7px 14px",
+                color: "#fff",
+                background: "#dc2626",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+            >
+              Delete
+            </button>
+
+            <button
+              type="button"
+              onClick={() => toast.dismiss(t.id)}
+              style={{
+                padding: "7px 14px",
+                color: "#374151",
+                background: "#f3f4f6",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: 6000, position: "top-center" }
+    );
+  };
 
   return (
     <div className={styles.card}>
@@ -38,7 +98,9 @@ export default function ListingCard({ listing, onDelete }) {
           {status}
         </span>
 
-        <span className={styles.conditionBadge}>{condition}</span>
+        {condition && (
+          <span className={styles.conditionBadge}>{condition}</span>
+        )}
       </div>
 
       <div className={styles.body}>
@@ -50,29 +112,6 @@ export default function ListingCard({ listing, onDelete }) {
           ₹{Number(listing.price ?? 0).toLocaleString("en-IN")}
         </span>
 
-        <div className={styles.statsRow}>
-          <div className={styles.statBox}>
-            <span className={styles.statValue}>
-              {listing.status === "SOLD" ? "0" : "—"}
-            </span>
-            <span className={styles.statLabel}>Stock</span>
-          </div>
-
-          <div className={styles.statBox}>
-            <span className={styles.statValue}>
-              {listing.soldCount ?? "—"}
-            </span>
-            <span className={styles.statLabel}>Sold</span>
-          </div>
-
-          <div className={styles.statBox}>
-            <span className={styles.statValue}>
-              {listing.soldCount ?? "—"}
-            </span>
-            <span className={styles.statLabel}>Sold count</span>
-          </div>
-        </div>
-
         <div className={styles.actions}>
           {listing.status === "AVAILABLE" && (
             <Link to={`/sell/${id}`} className={styles.editBtn}>
@@ -82,7 +121,7 @@ export default function ListingCard({ listing, onDelete }) {
 
           <button
             type="button"
-            onClick={onDelete}
+            onClick={handleDelete}
             className={styles.deleteBtn}
             aria-label={`Remove ${listing.title}`}
             title="Remove listing"
@@ -96,6 +135,7 @@ export default function ListingCard({ listing, onDelete }) {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <polyline points="3 6 5 6 21 6" />
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />

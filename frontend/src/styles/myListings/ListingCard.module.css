@@ -1,77 +1,323 @@
-/* Add to Cart Button */
-.cartBtn {
+
+.card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e7eaf0;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgb(26 43 76 / 5%);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: #d7dce6;
+  box-shadow: 0 12px 28px rgb(26 43 76 / 10%);
+}
+
+/* Image section */
+.imageWrap {
+  position: relative;
   width: 100%;
-  background: #f5a623;
-  color: #1a2b4c;
-  border: none;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  margin-bottom: 8px;
-  transition: all 0.2s;
+  height: 210px;
+  overflow: hidden;
+  background: #f3f5f8;
 }
 
-.cartBtn:hover {
-  background: #e0961e;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(245, 166, 35, 0.3);
-}
-
-/* Toast Popup */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-left: 4px solid #0f7a6b;
-  border-radius: 12px;
-  padding: 14px 18px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+.image {
   display: flex;
   align-items: center;
-  gap: 14px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1a2b4c;
-  z-index: 9999;
-  animation: slideInRight 0.3s ease;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  color: #8b95a5;
+  background: #f3f5f8;
+  font-size: 13px;
+  text-align: center;
+  transition: transform 0.35s ease;
 }
 
-.toastLink {
-  color: #0f7a6b;
-  text-decoration: none;
+.card:hover .image {
+  transform: scale(1.04);
+}
+
+/* Status badge */
+.statusBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+  padding: 6px 11px;
+  border-radius: 7px;
+  font-size: 11px;
   font-weight: 700;
-  font-size: 13px;
+  letter-spacing: 0.2px;
+  line-height: 1.2;
+}
+
+.statusActive {
+  color: #166534;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+}
+
+.statusSold {
+  color: #991b1b;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+/* Condition badge */
+.conditionBadge {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  max-width: calc(100% - 24px);
+  overflow: hidden;
+  padding: 6px 10px;
+  color: #344054;
+  background: rgb(255 255 255 / 94%);
+  border: 1px solid rgb(229 231 235 / 90%);
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.toastLink:hover {
-  text-decoration: underline;
+/* Card content */
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 18px;
 }
 
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
+.category {
+  max-width: 100%;
+  overflow: hidden;
+  color: #b77912;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.title {
+  display: -webkit-box;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  overflow: hidden;
+  color: #1a2b4c;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+}
+
+.price {
+  color: #1a2b4c;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  margin-top: 5px;
+  padding: 13px 0;
+  border-top: 1px solid #edf0f4;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.statBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 0 5px;
+  text-align: center;
+}
+
+.statBox + .statBox {
+  border-left: 1px solid #edf0f4;
+}
+
+.statValue {
+  max-width: 100%;
+  overflow: hidden;
+  color: #263956;
+  font-size: 15px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statLabel {
+  color: #7b8494;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 5px;
+}
+
+.editBtn {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 10px 16px;
+  color: #ffffff;
+  background: #1a2b4c;
+  border: 1px solid #1a2b4c;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.editBtn:hover {
+  color: #ffffff;
+  background: #263e68;
+  border-color: #263e68;
+}
+
+.deleteBtn {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: #b42318;
+  background: #fff5f4;
+  border: 1px solid #fecdca;
+  border-radius: 9px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.deleteBtn:hover {
+  color: #ffffff;
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.editBtn:focus-visible,
+.deleteBtn:focus-visible {
+  outline: 3px solid rgb(245 166 35 / 45%);
+  outline-offset: 3px;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .imageWrap {
+    height: 190px;
   }
-  to {
-    transform: translateX(0);
-    opacity: 1;
+
+  .body {
+    gap: 9px;
+    padding: 15px;
+  }
+
+  .title {
+    font-size: 16px;
+  }
+
+  .price {
+    font-size: 21px;
   }
 }
 
-@media (max-width: 600px) {
-  .cartBtn {
-    font-size: 12px;
-    padding: 8px;
+/* Mobile */
+@media (max-width: 480px) {
+  .card {
+    border-radius: 13px;
   }
-  .toast {
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
-    font-size: 13px;
+
+  .imageWrap {
+    height: 190px;
+  }
+
+  .body {
+    padding: 14px;
+  }
+
+  .title {
+    min-height: 42px;
+    font-size: 15px;
+  }
+
+  .price {
+    font-size: 21px;
+  }
+
+  .statValue {
+    font-size: 14px;
+  }
+
+  .statLabel {
+    font-size: 9px;
+  }
+
+  .editBtn,
+  .deleteBtn {
+    min-height: 38px;
+  }
+
+  .deleteBtn {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .image,
+  .editBtn,
+  .deleteBtn {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .card:hover .image {
+    transform: none;
   }
 }

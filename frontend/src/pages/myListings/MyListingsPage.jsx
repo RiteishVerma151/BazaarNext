@@ -1,5 +1,7 @@
+
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import Navbar from "../../components/commoncomponents/Navbar.jsx";
 import Footer from "../../components/commoncomponents/Footer.jsx";
 import ListingCard from "../../components/myListings/ListingCard.jsx";
@@ -35,33 +37,27 @@ export default function MyListingsPage() {
   }, [fetchListings]);
 
   const handleDelete = async (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to remove this listing?"
-    );
-
-    if (!confirmed) return;
-
     try {
       await api.delete(`/products/${id}`);
 
-      // Remove from UI only after backend confirms success.
       setListings((previous) =>
         previous.filter((item) => (item.id ?? item._id) !== id)
       );
+
+      toast.success("Listing deleted successfully!");
     } catch (err) {
-      window.alert(
+      toast.error(
         err.response?.data?.message || "Could not remove this listing."
       );
+
+      throw err;
     }
   };
 
   const filteredListings = listings.filter((item) => {
     if (activeTab === "All") return true;
-
     if (activeTab === "Active") return item.status === "AVAILABLE";
-
     if (activeTab === "Sold") return item.status === "SOLD";
-
     return false;
   });
 

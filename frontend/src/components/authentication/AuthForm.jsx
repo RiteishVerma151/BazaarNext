@@ -55,7 +55,7 @@ export default function AuthForm({ mode, onToggle }) {
         });
 
         setMessage(
-          result.data?.message || "Registration successful. Please sign in."
+          result.data?.message || "Registration successful. Please sign in.",
         );
 
         setF({
@@ -71,9 +71,8 @@ export default function AuthForm({ mode, onToggle }) {
     }
   };
 
-  const handleGoogle = () => {
-    setError("");
-    setMessage("Google login will be connected after the main integration.");
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:3001/api/auth/google";
   };
 
   return (
@@ -166,7 +165,7 @@ export default function AuthForm({ mode, onToggle }) {
         <button
           type="button"
           className={`btn btn-ghost ${styles.btnBlock} ${styles.authGoogle}`}
-          onClick={handleGoogle}
+          onClick={handleGoogleLogin}
           disabled={loading}
         >
           <span className={styles.googleG}>G</span>
@@ -175,9 +174,7 @@ export default function AuthForm({ mode, onToggle }) {
 
         <div className={styles.authSwitch}>
           <span>
-            {isLogin
-              ? "New to BazaarNext?"
-              : "Already have an account?"}
+            {isLogin ? "New to BazaarNext?" : "Already have an account?"}
           </span>
 
           <button

@@ -1,88 +1,128 @@
-import { useState } from "react";
+
+import { useCallback, useEffect, useState } from "react";
 import Navbar from "../../components/commoncomponents/Navbar.jsx";
 import Footer from "../../components/commoncomponents/Footer.jsx";
 import OrderCard from "../../components/myOrders/OrderCard.jsx";
 import OrderTabs from "../../components/myOrders/OrderTabs.jsx";
+import api from "../../lib/axios.js";
 import styles from "../../styles/myOrders/MyOrdersPage.module.css";
-
-// Mock Data (Baad me API se replace kar dena)
-const MOCK_ORDERS = [
-  {
-    id: "ORD-1024",
-    date: "Oct 18, 2026",
-    status: "Delivered",
-    total: 1250,
-    items: [
-      { name: "Premium leather backpack", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=400&q=80", price: 1250 }
-    ]
-  },
-  {
-    id: "ORD-1023",
-    date: "Oct 15, 2026",
-    status: "Out for Delivery",
-    total: 900,
-    items: [
-      { name: "Table fan", image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=400&q=80", price: 900 }
-    ]
-  },
-  {
-    id: "ORD-1022",
-    date: "Oct 10, 2026",
-    status: "Processing",
-    total: 2800,
-    items: [
-      { name: "Hero cycle", image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=400&q=80", price: 2800 }
-    ]
-  },
-  {
-    id: "ORD-1021",
-    date: "Sep 28, 2026",
-    status: "Cancelled",
-    total: 450,
-    items: [
-      { name: "School backpack", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=400&q=80", price: 450 }
-    ]
-  }
-];
 
 export default function MyOrdersPage() {
   const [activeTab, setActiveTab] = useState("All");
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Filter logic based on active tab
-  const filteredOrders = MOCK_ORDERS.filter((order) => {
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await api.get("/orders/my-orders");
+      const data = response.data;
+
+      if (data?.success === false) {
+        throw new Error(data.message || "Failed to load orders.");
+      }
+
+      const fetchedOrders = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.orders)
+          ? data.orders
+          : Array.isArray(data?.data?.orders)
+            ? data.data.orders
+            : [];
+
+      setOrders(fetchedOrders);
+    } catch (err) {
+      console.error("Fetch orders error:", err);
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Unable to load your orders."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
+  const filteredOrders = orders.filter((order) => {
+    const status = String(order.status || "").toLowerCase();
+
     if (activeTab === "All") return true;
-    if (activeTab === "Active") return ["Processing", "Out for Delivery"].includes(order.status);
-    return order.status === activeTab;
+
+    if (activeTab === "Active") {
+      return ["pending", "paid", "shipped"].includes(status);
+    }
+
+    if (activeTab === "Delivered") {
+      return status === "completed";
+    }
+
+    return status === activeTab.toLowerCase();
   });
 
   return (
     <>
       <Navbar />
+
       <main className={styles.page}>
         <div className={styles.container}>
-          
-          <div className={styles.header}>
+          <header className={styles.header}>
             <h1>My Orders</h1>
-            <p>Track, return, or buy things again</p>
-          </div>
+            <p>Track your purchases and check your order status.</p>
+          </header>
 
-          <OrderTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+          <OrderTabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
 
-          <div className={styles.ordersList}>
-            {filteredOrders.length > 0 ? (
-              filteredOrders.map((order) => (
-                <OrderCard key={order.id} order={order} />
-              ))
-            ) : (
-              <div className={styles.emptyState}>
-                <h2>No orders found</h2>
-                <p>You don't have any {activeTab.toLowerCase()} orders yet.</p>
-              </div>
-            )}
-          </div>
+          {loading ? (
+            <div className={styles.emptyState}>
+              <h2>Loading your orders...</h2>
+              <p>Please wait while we fetch your purchases.</p>
+            </div>
+          ) : error ? (
+            <div className={styles.emptyState}>
+              <h2>Couldn't load orders</h2>
+              <p>{error}</p>
+              <button type="button" onClick={fetchOrders}>
+                Try Again
+              </button>
+            </div>
+          ) : filteredOrders.length > 0 ? (
+            <div className={styles.ordersList}>
+              {filteredOrders.map((order, index) => (
+                <OrderCard
+                  key={order._id || order.id || index}
+                  order={order}
+                  onPaymentSuccess={fetchOrders}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className={styles.emptyState}>
+              <h2>
+                {orders.length === 0
+                  ? "No orders yet"
+                  : "No orders found"}
+              </h2>
 
+              <p>
+                {orders.length === 0
+                  ? "Products you order will appear here."
+                  : `You don't have any ${activeTab.toLowerCase()} orders.`}
+              </p>
+            </div>
+          )}
         </div>
       </main>
+
       <Footer />
     </>
   );

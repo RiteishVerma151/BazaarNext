@@ -1,6 +1,7 @@
+
 import styles from "../../styles/myOrders/OrderTabs.module.css";
 
-const TABS = ["All", "Active", "Delivered", "Cancelled"];
+const TABS = ["All", "Active", "Pending", "Paid", "Delivered"];
 
 export default function OrderTabs({ activeTab, setActiveTab }) {
   return (
@@ -8,8 +9,12 @@ export default function OrderTabs({ activeTab, setActiveTab }) {
       {TABS.map((tab) => (
         <button
           key={tab}
-          className={`${styles.tabBtn} ${activeTab === tab ? styles.active : ""}`}
+          type="button"
+          className={`${styles.tabBtn} ${
+            activeTab === tab ? styles.active : ""
+          }`}
           onClick={() => setActiveTab(tab)}
+          aria-pressed={activeTab === tab}
         >
           {tab}
         </button>

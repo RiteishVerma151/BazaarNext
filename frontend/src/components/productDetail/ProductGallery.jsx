@@ -136,7 +136,7 @@ export default function ProductGallery({
                 border: activeImage === index ? "2px solid white" : "2px solid transparent",
                 borderRadius: 6,
                 padding: 2,
-                background: "transparent",
+                background:"white",
                 cursor: "pointer",
               }}
             >

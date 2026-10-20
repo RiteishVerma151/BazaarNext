@@ -1,56 +1,217 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../components/commoncomponents/Navbar.jsx";
 import Footer from "../../components/commoncomponents/Footer.jsx";
-import { useCart } from "../../context/CartContext";
+import api from "../../lib/axios.js";
 import styles from "../../styles/checkout/CheckoutPage.module.css";
 
-const PAYMENT_METHODS = [
-  { id: "upi", label: "UPI (GPay, PhonePe)" },
-  { id: "card", label: "Credit / Debit Card" },
-  { id: "cod", label: "Cash on Delivery (+₹25)" },
-];
-
-export default function CheckoutPage() {
-  const { cart, cartTotal, clearCart } = useCart();
-  const [address, setAddress] = useState({
-    name: "",
-    phone: "",
-    line: "",
-    city: "",
-    pincode: "",
-  });
-  const [payment, setPayment] = useState("upi");
-  const [placed, setPlaced] = useState(false);
-  const [orderId, setOrderId] = useState("");
-
-  const deliveryFee = 40;
-  const tax = Math.round(cartTotal * 0.05);
-  const codFee = payment === "cod" ? 25 : 0;
-  const total = cartTotal + deliveryFee + tax + codFee;
-
-  const handlePlaceOrder = (e) => {
-    e.preventDefault();
-    if (cart.length === 0) {
-      alert("Cart is empty");
+function loadRazorpayScript() {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
       return;
     }
-    const id = "ORD-" + Math.floor(1000 + Math.random() * 9000);
-    setOrderId(id);
-    setPlaced(true);
-    clearCart();
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
+export default function CheckoutPage() {
+  const { productId } = useParams();
+  const navigate = useNavigate();
+
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [paying, setPaying] = useState(false);
+  const [error, setError] = useState("");
+  const [successOrderId, setSuccessOrderId] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function fetchProduct() {
+      try {
+        setLoading(true);
+        setError("");
+
+        if (!productId) {
+          setError("Product ID is missing.");
+          return;
+        }
+
+        const response = await api.get(`/products/${productId}`);
+        const data = response.data?.product;
+
+        // Backend productResponse returns "id", not "_id".
+        if (!data?.id) {
+          setError(response.data?.message || "Product not found.");
+          return;
+        }
+
+        if (data.status !== "AVAILABLE") {
+          setError("This product is no longer available.");
+          return;
+        }
+
+        if (active) {
+          setProduct({
+            ...data,
+            _id: data.id,
+          });
+        }
+      } catch (err) {
+        if (active) {
+          setError(
+            err.response?.data?.message ||
+              "Unable to load this product."
+          );
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchProduct();
+
+    return () => {
+      active = false;
+    };
+  }, [productId]);
+
+  const handlePayment = async () => {
+    if (!product?._id || paying) return;
+
+    try {
+      setPaying(true);
+      setError("");
+
+      // 1. Create a real order in our backend.
+      const orderResponse = await api.post("/orders", {
+        productId: product._id,
+      });
+
+      const order = orderResponse.data?.order;
+
+      if (!order?._id) {
+        throw new Error("Order creation failed. Please try again.");
+      }
+
+      // 2. Create the Razorpay order.
+      const paymentResponse = await api.post("/payments/create-order", {
+        orderId: order._id,
+      });
+
+      const paymentData = paymentResponse.data?.payment;
+      const keyId = paymentResponse.data?.keyId;
+
+      if (!paymentData?.razorpayOrderId || !keyId) {
+        throw new Error("Unable to initialize Razorpay payment.");
+      }
+
+      // 3. Load Razorpay Checkout.
+      const loaded = await loadRazorpayScript();
+
+      if (!loaded) {
+        throw new Error(
+          "Razorpay Checkout failed to load. Check your internet connection."
+        );
+      }
+
+      const options = {
+        key: keyId,
+        amount: paymentData.amount,
+        currency: paymentData.currency || "INR",
+        name: "BazaarNext",
+        description: product.title || "Product purchase",
+        order_id: paymentData.razorpayOrderId,
+
+        handler: async (razorpayResponse) => {
+          try {
+            // 4. Verify the payment on the backend.
+            const verifyResponse = await api.post("/payments/verify", {
+              razorpayOrderId: razorpayResponse.razorpay_order_id,
+              razorpayPaymentId: razorpayResponse.razorpay_payment_id,
+              razorpaySignature: razorpayResponse.razorpay_signature,
+            });
+
+            if (!verifyResponse.data?.success) {
+              throw new Error("Payment verification failed.");
+            }
+
+            setSuccessOrderId(order._id);
+          } catch (err) {
+            setError(
+              err.response?.data?.message ||
+                err.message ||
+                "Payment verification failed. Check My Orders before retrying."
+            );
+          } finally {
+            setPaying(false);
+          }
+        },
+
+        modal: {
+          ondismiss: () => {
+            setPaying(false);
+          },
+        },
+
+        theme: {
+          color: "#6af0ff",
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.on("payment.failed", (response) => {
+        setError(
+          response.error?.description ||
+            "Payment failed. Please try again."
+        );
+        setPaying(false);
+      });
+
+      razorpay.open();
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Unable to start checkout."
+      );
+      setPaying(false);
+    }
   };
 
-  if (placed) {
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <main className={styles.page}>
+          <p>Loading product...</p>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (successOrderId) {
     return (
       <>
         <Navbar />
         <main className={styles.page}>
           <div className={styles.successCard}>
-            <div style={{ fontSize: "60px", marginBottom: "16px" }}>🎉</div>
-            <h1>Order Placed!</h1>
+            <div style={{ fontSize: 60, marginBottom: 16 }}>🎉</div>
+            <h1>Payment Successful!</h1>
             <p>
-              Your order <strong>#{orderId}</strong> has been placed successfully.
+              Payment verified successfully. Your order ID is{" "}
+              <strong>{successOrderId}</strong>.
             </p>
             <Link to="/my-orders" className={styles.successBtn}>
               View My Orders
@@ -62,121 +223,118 @@ export default function CheckoutPage() {
     );
   }
 
+  if (error && !product) {
+    return (
+      <>
+        <Navbar />
+        <main className={styles.page}>
+          <div className={styles.successCard}>
+            <h1>Unable to Open Checkout</h1>
+            <p role="alert">{error}</p>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className={styles.successBtn}
+            >
+              Go Back
+            </button>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  const price = Number(product?.price || 0);
+
   return (
     <>
       <Navbar />
+
       <main className={styles.page}>
         <div className={styles.container}>
           <h1 className={styles.title}>Checkout</h1>
-          <p className={styles.subtitle}>Complete your purchase</p>
+          <p className={styles.subtitle}>
+            Review your product and complete your payment.
+          </p>
 
-          <form onSubmit={handlePlaceOrder} className={styles.layout}>
+          <div className={styles.layout}>
             <div className={styles.mainCol}>
-              {/* Address */}
-              <div className={styles.section}>
-                <h2>Delivery Address</h2>
-                <div className={styles.row}>
-                  <input
-                    placeholder="Full name"
-                    required
-                    value={address.name}
-                    onChange={(e) => setAddress({ ...address, name: e.target.value })}
-                  />
-                  <input
-                    placeholder="Phone"
-                    required
-                    value={address.phone}
-                    onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-                  />
-                </div>
-                <input
-                  placeholder="Address (House no, street, area)"
-                  required
-                  value={address.line}
-                  onChange={(e) => setAddress({ ...address, line: e.target.value })}
-                />
-                <div className={styles.row}>
-                  <input
-                    placeholder="City"
-                    required
-                    value={address.city}
-                    onChange={(e) => setAddress({ ...address, city: e.target.value })}
-                  />
-                  <input
-                    placeholder="Pincode"
-                    required
-                    value={address.pincode}
-                    onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
-                  />
-                </div>
-              </div>
+              <section className={styles.section}>
+                <h2>Product Details</h2>
 
-              {/* Payment */}
-              <div className={styles.section}>
-                <h2>Payment Method</h2>
-                <div className={styles.payments}>
-                  {PAYMENT_METHODS.map((m) => (
-                    <label
-                      key={m.id}
-                      className={`${styles.payOption} ${
-                        payment === m.id ? styles.payActive : ""
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="payment"
-                        value={m.id}
-                        checked={payment === m.id}
-                        onChange={() => setPayment(m.id)}
-                      />
-                      {m.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
+                {product.images?.[0] && (
+                  <img
+                    src={
+                      product.images[0].startsWith("http")
+                        ? product.images[0]
+                        : `${api.defaults.baseURL?.replace(/\/api\/?$/, "") || ""}${product.images[0]}`
+                    }
+                    alt={product.title}
+                    style={{
+                      width: "100%",
+                      maxWidth: 280,
+                      maxHeight: 220,
+                      objectFit: "contain",
+                      borderRadius: 12,
+                    }}
+                  />
+                )}
+
+                <h3>{product.title}</h3>
+                <p>{product.description}</p>
+
+                <p>
+                  Price:{" "}
+                  <strong>₹{price.toLocaleString("en-IN")}</strong>
+                </p>
+              </section>
             </div>
 
-            {/* Summary */}
-            <div className={styles.summary}>
+            <aside className={styles.summary}>
               <h2>Order Summary</h2>
-              {cart.map((item) => (
-                <div key={item.id} className={styles.rowLine}>
-                  <span>
-                    {item.name} × {item.qty}
-                  </span>
-                  <span>₹{(item.price * item.qty).toLocaleString("en-IN")}</span>
-                </div>
-              ))}
+
+              <div className={styles.rowLine}>
+                <span>{product.title}</span>
+                <span>₹{price.toLocaleString("en-IN")}</span>
+              </div>
+
               <div className={styles.divider} />
-              <div className={styles.rowLine}>
-                <span>Subtotal</span>
-                <span>₹{cartTotal.toLocaleString("en-IN")}</span>
-              </div>
-              <div className={styles.rowLine}>
-                <span>Delivery</span>
-                <span>₹{deliveryFee}</span>
-              </div>
-              <div className={styles.rowLine}>
-                <span>GST (5%)</span>
-                <span>₹{tax}</span>
-              </div>
-              {payment === "cod" && (
-                <div className={styles.rowLine}>
-                  <span>COD fee</span>
-                  <span>₹{codFee}</span>
-                </div>
-              )}
+
               <div className={styles.totalRow}>
                 <span>Total</span>
-                <strong>₹{total.toLocaleString("en-IN")}</strong>
+                <strong>₹{price.toLocaleString("en-IN")}</strong>
               </div>
-              <button type="submit" className={styles.placeBtn}>
-                {payment === "cod" ? "Place Order" : `Pay ₹${total.toLocaleString("en-IN")}`}
+
+              {error && (
+                <p role="alert" style={{ color: "#dc2626" }}>
+                  {error}
+                </p>
+              )}
+
+              <button
+                type="button"
+                className={styles.placeBtn}
+                onClick={handlePayment}
+                disabled={paying || product.status !== "AVAILABLE"}
+              >
+                {paying
+                  ? "Processing..."
+                  : `Pay ₹${price.toLocaleString("en-IN")}`}
               </button>
-            </div>
-          </form>
+
+              <p style={{ fontSize: 13, color: "#64748b" }}>
+                Payment is processed securely through Razorpay.
+              </p>
+
+              <Link to={`/product/${productId}`}>
+                Back to Product
+              </Link>
+            </aside>
+          </div>
         </div>
       </main>
+
       <Footer />
     </>
   );

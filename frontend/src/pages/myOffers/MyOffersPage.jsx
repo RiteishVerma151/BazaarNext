@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../lib/axios.js";
@@ -13,6 +12,37 @@ const statusColor = {
   ACCEPTED: "#15803d",
   REJECTED: "#dc2626",
   CANCELLED: "#64748b",
+};
+
+const loadRazorpayScript = () =>
+  new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+
+const getId = (value) => {
+  if (!value) return "";
+
+  if (typeof value === "object") {
+    return String(value._id || value.id || "");
+  }
+
+  return String(value);
+};
+
+const getOrdersArray = (data) => {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.orders)) return data.orders;
+  if (Array.isArray(data?.data?.orders)) return data.data.orders;
+  return [];
 };
 
 const styles = {
@@ -49,6 +79,7 @@ const styles = {
 
 export default function MyOffersPage() {
   const [offers, setOffers] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState("");
   const [error, setError] = useState("");
@@ -57,10 +88,19 @@ export default function MyOffersPage() {
   const fetchOffers = useCallback(async () => {
     try {
       setError("");
-      const response = await api.get("/negotiations/my");
-      setOffers(response.data.offers ?? []);
+
+      const [offersResponse, ordersResponse] = await Promise.all([
+        api.get("/negotiations/my"),
+        api.get("/orders/my-orders"),
+      ]);
+
+      setOffers(offersResponse.data?.offers ?? []);
+      setOrders(getOrdersArray(ordersResponse.data));
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to load your offers.");
+      setError(
+        err.response?.data?.message ||
+          "Unable to load offers and order payment status."
+      );
     } finally {
       setLoading(false);
     }
@@ -69,6 +109,21 @@ export default function MyOffersPage() {
   useEffect(() => {
     fetchOffers();
   }, [fetchOffers]);
+
+  // Find the order linked to this offer.
+  const getOfferOrder = (offerId, orderList = orders) => {
+    return orderList.find(
+      (order) =>
+        getId(order.negotiation) === String(offerId)
+    );
+  };
+
+  const isOrderPaid = (order) => {
+    return (
+      order?.status === "paid" ||
+      order?.status === "completed"
+    );
+  };
 
   const cancelOffer = async (offerId) => {
     if (!window.confirm("Do you want to cancel this offer?")) return;
@@ -82,12 +137,170 @@ export default function MyOffersPage() {
         `/negotiations/${offerId}/cancel`
       );
 
-      setNotice(response.data.message || "Offer cancelled successfully.");
+      setNotice(
+        response.data.message || "Offer cancelled successfully."
+      );
+
       await fetchOffers();
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to cancel this offer.");
-      await fetchOffers();
+      setError(
+        err.response?.data?.message || "Unable to cancel this offer."
+      );
     } finally {
+      setBusyId("");
+    }
+  };
+
+  const payForOffer = async (offer) => {
+    if (busyId || offer.status !== "ACCEPTED") return;
+
+    try {
+      setBusyId(offer._id);
+      setError("");
+      setNotice("");
+
+      // Refresh the order list before opening checkout.
+      const ordersResponse = await api.get("/orders/my-orders");
+      const latestOrders = getOrdersArray(ordersResponse.data);
+
+      setOrders(latestOrders);
+
+      const existingOrder = getOfferOrder(
+        offer._id,
+        latestOrders
+      );
+
+      // Prevent another payment if this offer is already paid.
+      if (isOrderPaid(existingOrder)) {
+        setNotice("This offer has already been paid successfully.");
+        return;
+      }
+
+      let order = existingOrder;
+
+      // Create an order only if no linked order exists.
+      if (!order) {
+        const orderResponse = await api.post("/orders", {
+          negotiationId: offer._id,
+        });
+
+        order =
+          orderResponse.data?.order ||
+          orderResponse.data?.data?.order;
+
+        if (!orderResponse.data?.success || !order?._id) {
+          throw new Error(
+            orderResponse.data?.message ||
+              "Unable to create order for this offer."
+          );
+        }
+      }
+
+      if (isOrderPaid(order)) {
+        setNotice("This offer has already been paid successfully.");
+        return;
+      }
+
+      if (order.status !== "pending") {
+        throw new Error(
+          "This order is not currently available for payment."
+        );
+      }
+
+      const scriptLoaded = await loadRazorpayScript();
+
+      if (!scriptLoaded) {
+        throw new Error(
+          "Unable to load Razorpay. Check your internet connection."
+        );
+      }
+
+      const paymentResponse = await api.post(
+        "/payments/create-order",
+        { orderId: order._id }
+      );
+
+      const paymentData = paymentResponse.data;
+      const payment = paymentData?.payment;
+
+      if (
+        !paymentData?.success ||
+        !payment?.razorpayOrderId ||
+        !paymentData?.keyId
+      ) {
+        throw new Error(
+          paymentData?.message || "Unable to start payment."
+        );
+      }
+
+      const razorpay = new window.Razorpay({
+        key: paymentData.keyId,
+        amount: payment.amount,
+        currency: payment.currency || "INR",
+        name: "BazaarNext",
+        description: offer.product?.title || "Accepted offer",
+        order_id: payment.razorpayOrderId,
+
+        handler: async (razorpayResponse) => {
+          try {
+            const verificationResponse = await api.post(
+              "/payments/verify",
+              {
+                razorpayOrderId:
+                  razorpayResponse.razorpay_order_id,
+                razorpayPaymentId:
+                  razorpayResponse.razorpay_payment_id,
+                razorpaySignature:
+                  razorpayResponse.razorpay_signature,
+              }
+            );
+
+            if (!verificationResponse.data?.success) {
+              throw new Error(
+                verificationResponse.data?.message ||
+                  "Payment verification failed."
+              );
+            }
+
+            setNotice("Payment successful! Your order is updated.");
+
+            // Reload offers AND orders to remove the Pay button.
+            await fetchOffers();
+          } catch (err) {
+            setError(
+              err.response?.data?.message ||
+                err.message ||
+                "Unable to verify payment. Check My Orders for the latest status."
+            );
+
+            await fetchOffers();
+          } finally {
+            setBusyId("");
+          }
+        },
+
+        modal: {
+          ondismiss: () => setBusyId(""),
+        },
+
+        theme: { color: "#0f766e" },
+      });
+
+      razorpay.on("payment.failed", (event) => {
+        setError(
+          event.error?.description ||
+            "Payment failed. Please try again."
+        );
+        setBusyId("");
+      });
+
+      razorpay.open();
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Unable to start payment for this offer."
+      );
       setBusyId("");
     }
   };
@@ -95,8 +308,10 @@ export default function MyOffersPage() {
   return (
     <>
       <Navbar />
+
       <main style={styles.page}>
         <h1 style={styles.heading}>My Offers</h1>
+
         <p style={styles.subtitle}>
           Track your offers and check whether sellers have responded.
         </p>
@@ -128,7 +343,13 @@ export default function MyOffersPage() {
             {offers.map((offer) => {
               const product = offer.product;
               const seller = offer.seller;
+
               const pending = offer.status === "PENDING";
+              const accepted = offer.status === "ACCEPTED";
+              const isBusy = busyId === offer._id;
+
+              const order = getOfferOrder(offer._id);
+              const paid = isOrderPaid(order);
 
               return (
                 <article key={offer._id} style={styles.card}>
@@ -143,27 +364,44 @@ export default function MyOffersPage() {
                     <h3 style={{ margin: "0 0 12px", fontSize: 19 }}>
                       {product?.title || "Product unavailable"}
                     </h3>
+
                     <span
                       style={{
-                        color: statusColor[offer.status] || "#64748b",
+                        color: paid
+                          ? "#15803d"
+                          : statusColor[offer.status] || "#64748b",
                         fontSize: 12,
                         fontWeight: 700,
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {offer.status}
+                      {paid ? "PAID" : offer.status}
                     </span>
                   </div>
 
                   <p style={{ margin: "8px 0" }}>
                     Listed price: <strong>{money(product?.price)}</strong>
                   </p>
+
                   <p style={{ margin: "8px 0" }}>
                     Your offer:{" "}
                     <strong style={{ fontSize: 21, color: "#0f766e" }}>
                       {money(offer.offerPrice)}
                     </strong>
                   </p>
+
+                  {accepted && !paid && (
+                    <p style={{ color: "#15803d", fontWeight: 600 }}>
+                      Offer accepted! Pay the agreed price below.
+                    </p>
+                  )}
+
+                  {paid && (
+                    <p style={{ color: "#15803d", fontWeight: 600 }}>
+                      ✓ Payment completed successfully.
+                    </p>
+                  )}
+
                   <p style={{ margin: "8px 0", color: "#64748b" }}>
                     Seller: {seller?.name || seller?.username || "Seller"}
                   </p>
@@ -181,33 +419,46 @@ export default function MyOffersPage() {
                       : "Date unavailable"}
                   </p>
 
-                  {offer.status === "ACCEPTED" && (
-                    <p style={{ color: "#15803d", fontWeight: 600 }}>
-                      Your offer was accepted!
-                    </p>
-                  )}
-
-                  {offer.status === "REJECTED" && (
-                    <p style={{ color: "#dc2626" }}>
-                      This offer was rejected. You can try another product or
-                      submit a new offer if the product is still available.
-                    </p>
-                  )}
-
                   {pending && (
                     <button
                       type="button"
-                      disabled={busyId === offer._id}
+                      disabled={Boolean(busyId)}
                       onClick={() => cancelOffer(offer._id)}
                       style={{
                         ...styles.button,
                         background: "#64748b",
                         marginTop: 10,
-                        opacity: busyId === offer._id ? 0.6 : 1,
+                        opacity: busyId ? 0.6 : 1,
                       }}
                     >
-                      {busyId === offer._id ? "Cancelling..." : "Cancel Offer"}
+                      {isBusy ? "Cancelling..." : "Cancel Offer"}
                     </button>
+                  )}
+
+                  {accepted && !paid && (
+                    <button
+                      type="button"
+                      disabled={Boolean(busyId)}
+                      onClick={() => payForOffer(offer)}
+                      style={{
+                        ...styles.button,
+                        display: "block",
+                        width: "100%",
+                        background: "#0f766e",
+                        marginTop: 14,
+                        opacity: busyId ? 0.6 : 1,
+                      }}
+                    >
+                      {isBusy
+                        ? "Opening payment..."
+                        : `Pay ${money(offer.offerPrice)}`}
+                    </button>
+                  )}
+
+                  {offer.status === "REJECTED" && (
+                    <p style={{ color: "#dc2626" }}>
+                      This offer was rejected.
+                    </p>
                   )}
 
                   {product?._id && product.status === "AVAILABLE" && (
@@ -223,6 +474,7 @@ export default function MyOffersPage() {
           </div>
         )}
       </main>
+
       <Footer />
     </>
   );
