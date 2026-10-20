@@ -143,12 +143,16 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
-    res.cookie("token", token, {
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000,
+      secure: true,
+      sameSite: "none",
       path: "/",
+    };
+
+    res.cookie("token", token, {
+      ...cookieOptions,
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     return res.status(200).json({
@@ -172,11 +176,7 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  });
+  res.clearCookie("token", cookieOptions);
 
   return res.status(200).json({
     success: true,
