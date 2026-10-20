@@ -1,70 +1,91 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Navbar from "../../components/commoncomponents/Navbar.jsx";
 import Footer from "../../components/commoncomponents/Footer.jsx";
 import ProductGallery from "../../components/productDetail/ProductGallery.jsx";
+import ProductHeader from "../../components/productDetail/ProductHeader.jsx";
+import ProductActions from "../../components/productDetail/ProductActions.jsx";
 import ProductSellerCard from "../../components/productDetail/ProductSellerCard.jsx";
 import ProductTabs from "../../components/productDetail/ProductTabs.jsx";
-import styles from "../../styles/ProductDetail/ProductDetailPage.module.css"; // CSS paas me hi hai
+import { PRODUCTS } from "../../data/products.js";
+import { getSeller } from "../../data/sellers.js";
+import styles from "../../styles/productDetail/ProductDetailPage.module.css";
+
+const CATEGORY_COLORS = {
+  Bags: "#7A4FD1",
+  Cycles: "#0F7A6B",
+  Furniture: "#D6573C",
+  "Daily essentials": "#2C7A7B",
+};
+const colorOf = (category) => CATEGORY_COLORS[category] || "#2B6CB0";
 
 export default function ProductDetailPage() {
+  const { id } = useParams();
+  const found = PRODUCTS.find((p) => String(p.id) === id);
+
+  if (!found) {
+    return (
+      <>
+        <Navbar />
+        <main className={styles.page}>
+          <div className={styles.container}>
+            <h1 className={styles.title}>Product not found</h1>
+            <p style={{ margin: "12px 0 20px" }}>This listing may have been removed.</p>
+            <Link to="/products">Browse products</Link>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  const product = { ...found, color: colorOf(found.category), location: found.info };
+  const seller = getSeller(product.id);
+
   return (
     <>
       <Navbar />
       <main className={styles.page}>
         <div className={styles.container}>
-          
-          {/* Breadcrumbs */}
+
           <nav className={styles.breadcrumb}>
             <Link to="/">Home</Link>
             <span>/</span>
-            <Link to="/shop">Shop</Link>
+            <Link to="/products">Shop</Link>
             <span>/</span>
-            <span className={styles.current}>Backpack</span>
+            <Link to={`/products?cat=${encodeURIComponent(product.category)}`}>
+              {product.category}
+            </Link>
+            <span>/</span>
+            <span className={styles.current}>{product.name}</span>
           </nav>
 
-          {/* Main Product Section */}
           <div className={styles.productSection}>
-            
-            {/* Left: Image Component */}
-            <ProductGallery />
+            <ProductGallery
+              image={product.image}
+              name={product.name}
+              condition={product.condition}
+              color={product.color}
+            />
 
-            {/* Right: Details Area */}
             <div className={styles.detailsArea}>
-              <h1 className={styles.title}>Premium leather backpack</h1>
-              
-              <div className={styles.meta}>
-                <span className={styles.location}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                  Ulhasnagar 2
-                </span>
-                <span className={styles.posted}>Posted 2 days ago</span>
-              </div>
+              {/* ✅ Header (title + meta + price) */}
+              <ProductHeader
+                name={product.name}
+                location={product.location}
+                price={product.price}
+              />
 
-              <div className={styles.priceRow}>
-                <span className={styles.price}>₹1,250</span>
-                <span className={styles.negotiable}>Negotiable</span>
-              </div>
+              <ProductSellerCard seller={seller} />
 
-              {/* Seller Component */}
-              <ProductSellerCard />
+              {/* ✅ Actions (buttons + safety + toast) */}
+              <ProductActions productId={product.id} product={product} />
 
-              <div className={styles.actions}>
-                <button className={styles.buyBtn}>Buy Now</button>
-                <button className={styles.offerBtn}>Make an Offer</button>
-              </div>
-
-              <p className={styles.safetyText}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-                Always meet in a public place and inspect the item before paying.
-              </p>
-
-              {/* Tabs Component */}
-              <ProductTabs />
+              <ProductTabs
+                description={product.description}
+                category={product.category}
+                condition={product.condition}
+                location={product.location}
+              />
             </div>
           </div>
 

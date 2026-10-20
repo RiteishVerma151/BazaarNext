@@ -292,26 +292,15 @@ textarea + .charCount { bottom: 12px; }
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  margin-bottom: 10px;
 }
 .publishBtn:hover {
   background: #e0961e;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(245, 166, 35, 0.3);
 }
-.draftBtn {
-  width: 100%;
-  background: transparent;
-  color: #1a2b4c;
-  border: 1px solid #e5e7eb;
-  padding: 13px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.draftBtn:hover { background: #f3f4f6; border-color: #1a2b4c; }
+
+/* ❌ .draftBtn aur .draftBtn:hover yahan se hata diya gaya hai */
+
 .tip {
   font-size: 12px;
   color: #6b7280;

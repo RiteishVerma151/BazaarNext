@@ -1,0 +1,143 @@
+/* =========================================
+   ACTION BUTTONS
+   ========================================= */
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.buyBtn,
+.offerBtn {
+  flex: 1;
+  min-width: 120px;
+  border: none;
+  padding: 11px 18px;        /* 👈 height kam (16px → 11px) */
+  border-radius: 10px;
+  font-size: 14px;           /* 👈 font kam (15px → 14px) */
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  letter-spacing: -0.1px;
+  line-height: 1.2;
+}
+
+/* Buy Now — Yellow (primary CTA) */
+.buyBtn {
+  background: var(--warning, #f5a623);
+  color: var(--ink, #1a2b4c);
+}
+.buyBtn:hover {
+  background: var(--warning-dark, #e0961e);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
+}
+.buyBtn:active {
+  transform: translateY(0);
+}
+
+/* Add to Cart / Chat — Navy */
+.offerBtn {
+  background: var(--ink, #1a2b4c);
+  color: #fff;
+}
+.offerBtn:hover {
+  background: #111e35;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 43, 76, 0.3);
+}
+.offerBtn:active {
+  transform: translateY(0);
+}
+
+/* =========================================
+   SAFETY TEXT
+   ========================================= */
+.safetyText {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted, #6b7280);
+  margin-bottom: 24px;
+  line-height: 1.4;
+  padding: 8px 12px;
+  background: var(--bg, #f8f9fa);
+  border-radius: 10px;
+  border: 1px solid var(--line, #e5e7eb);
+}
+.safetyText svg {
+  flex: none;
+  color: var(--success, #0f7a6b);
+  width: 14px;
+  height: 14px;
+}
+
+/* =========================================
+   TOAST
+   ========================================= */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #e5e7eb);
+  border-left: 4px solid var(--success, #0f7a6b);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink, #1a2b4c);
+  z-index: 9999;
+  animation: slideInRight 0.3s ease;
+}
+
+.toastLink {
+  color: var(--success, #0f7a6b);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.toastLink:hover { text-decoration: underline; }
+
+@keyframes slideInRight {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 600px) {
+  .actions {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .buyBtn,
+  .offerBtn {
+    width: 100%;
+    padding: 11px 16px;
+    font-size: 13px;
+    min-width: 0;
+  }
+  .safetyText {
+    font-size: 11px;
+    padding: 8px 10px;
+    margin-bottom: 20px;
+  }
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+}

@@ -19,6 +19,7 @@ export default function SellProductPage() {
     category: "Bags",
     condition: "Good",
     price: "",
+    stock: 1, // 👈 Stock state me add kar diya (default 1)
     negotiable: false,
     description: "",
     location: "Ulhasnagar 1",
@@ -38,6 +39,7 @@ export default function SellProductPage() {
     const errs = {};
     if (!form.title.trim()) errs.title = "Product title is required";
     if (!form.price || Number(form.price) <= 0) errs.price = "Enter a valid price";
+    if (!form.stock || Number(form.stock) < 1) errs.stock = "Stock must be at least 1"; // 👈 Validation add ki
     if (!form.description.trim()) errs.description = "Description is required";
     if (form.images.length === 0) errs.images = "Add at least one photo";
     setErrors(errs);
@@ -49,13 +51,11 @@ export default function SellProductPage() {
     if (!validate()) return;
     // TODO: POST /api/products (FormData)
     setSubmitted(true);
-    setTimeout(() => navigate("/my-orders"), 2200);
+    // 👈 Redirect change kiya taaki publish hote hi My Listings page khule
+    setTimeout(() => navigate("/my-listings"), 2200); 
   };
 
-  const handleDraft = () => {
-    // TODO: Save draft API
-    alert("Saved as draft (API pending)");
-  };
+ 
 
   if (submitted) {
     return (
@@ -153,23 +153,40 @@ export default function SellProductPage() {
                 </div>
               </section>
 
-              {/* Pricing */}
+              {/* Pricing & Stock */}
               <section className={styles.section}>
-                <h2>Pricing</h2>
-                <div className={styles.inputGroup}>
-                  <label>Asking Price *</label>
-                  <div className={styles.priceInput}>
-                    <span className={styles.currency}>₹</span>
+                <h2>Pricing & Stock</h2>
+                
+                <div className={styles.row}>
+                  <div className={styles.inputGroup}>
+                    <label>Asking Price *</label>
+                    <div className={styles.priceInput}>
+                      <span className={styles.currency}>₹</span>
+                      <input
+                        type="number"
+                        name="price"
+                        value={form.price}
+                        onChange={handleChange}
+                        placeholder="0"
+                        min="0"
+                      />
+                    </div>
+                    {errors.price && <span className={styles.error}>{errors.price}</span>}
+                  </div>
+
+                  {/* 👈 Naya Stock Input */}
+                  <div className={styles.inputGroup}>
+                    <label>Stock Quantity *</label>
                     <input
                       type="number"
-                      name="price"
-                      value={form.price}
+                      name="stock"
+                      value={form.stock}
                       onChange={handleChange}
-                      placeholder="0"
-                      min="0"
+                      placeholder="1"
+                      min="1"
                     />
+                    {errors.stock && <span className={styles.error}>{errors.stock}</span>}
                   </div>
-                  {errors.price && <span className={styles.error}>{errors.price}</span>}
                 </div>
 
                 <label className={styles.checkRow}>
@@ -224,16 +241,14 @@ export default function SellProductPage() {
                     </span>
                     {form.negotiable && <span className={styles.previewNeg}>Negotiable</span>}
                   </div>
-                  <p className={styles.previewLocation}>📍 {form.location}</p>
+                 
+                 
                 </div>
               </div>
 
               <div className={styles.submitBox}>
                 <button type="submit" className={styles.publishBtn}>
                   {isEdit ? "Update Listing" : "Publish Listing"}
-                </button>
-                <button type="button" className={styles.draftBtn} onClick={handleDraft}>
-                  Save as Draft
                 </button>
                 <p className={styles.tip}>
                   💡 Listings with clear photos and honest descriptions sell 3x faster.

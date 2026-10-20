@@ -1,0 +1,148 @@
+.chartCard {
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 20px;
+  padding: 22px;
+  min-width: 0;          /* 👈 Card ko shrink hone do */
+  overflow: hidden;      /* 👈 Card ke bahar kuch na jaye */
+  max-width: 100%;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+.cardHeader h2 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink, #1a2b4c);
+  margin: 0 0 3px 0;
+}
+.cardHeader p {
+  font-size: 12px;
+  color: var(--muted, #6b7280);
+  margin: 0;
+}
+.chartTotal {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--success, #0f7a6b);
+  white-space: nowrap;
+}
+
+/* 👇 Scroll wrapper — sirf isi ke andar scroll hoga */
+.chartScroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line, #e5e7eb) transparent;
+  padding-bottom: 6px;   /* scrollbar ke liye jagah */
+  margin-bottom: -6px;
+}
+.chartScroll::-webkit-scrollbar {
+  height: 6px;
+}
+.chartScroll::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+.chartScroll::-webkit-scrollbar-thumb {
+  background: var(--line, #e5e7eb);
+  border-radius: 3px;
+}
+.chartScroll::-webkit-scrollbar-thumb:hover {
+  background: var(--muted, #9ca3af);
+}
+
+/* Chart */
+.chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  height: 200px;
+  padding: 10px 0;
+  width: 100%;           /* 👈 Default full width */
+}
+
+.chartCol {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+.chartBarWrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.chartBar {
+  width: 100%;
+  max-width: 40px;
+  background: linear-gradient(180deg, var(--warning, #f5a623) 0%, var(--warning-dark, #e0961e) 100%);
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  transition: all 0.3s ease;
+  min-height: 4px;
+}
+.chartBar:hover {
+  background: linear-gradient(180deg, var(--ink, #1a2b4c) 0%, #0f1a33 100%);
+  transform: scaleY(1.03);
+}
+.chartValue {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted, #6b7280);
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.chartBar:hover .chartValue { opacity: 1; }
+.chartDay {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted, #9ca3af);
+}
+
+/* ==========================================
+   MOBILE — Card ke andar scroll, page pe nahi
+   ========================================== */
+@media (max-width: 600px) {
+  .chartCard { padding: 16px; border-radius: 16px; }
+  .cardHeader h2 { font-size: 15px; }
+  .cardHeader p { font-size: 11px; }
+  .chartTotal { font-size: 15px; }
+
+  .chart {
+    height: 160px;
+    gap: 8px;
+    padding: 8px 0;
+    /* 👇 Chart ab card se zyada wide hoga, par .chartScroll me scroll hoga */
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .chartCol {
+    flex: 0 0 52px;    /* Fixed width bars — scrollable */
+    min-width: 52px;
+  }
+  .chartBar { max-width: 44px; }
+  .chartDay { font-size: 10px; font-weight: 700; }
+  .chartValue { display: none; }
+}

@@ -1,0 +1,144 @@
+.page { background: #f4f6f8; padding: 40px 0 80px; min-height: 100vh; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.title {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--ink, #1a2b4c);
+  margin: 0 0 4px;
+}
+.subtitle { color: var(--muted, #6b7280); font-size: 14px; margin: 0 0 24px; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+.cartList { display: flex; flex-direction: column; gap: 12px; }
+.cartItem {
+  background: #fff;
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.itemImg {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex: none;
+}
+.itemInfo { flex: 1; min-width: 0; }
+.itemInfo h3 { font-size: 14px; font-weight: 700; color: var(--ink, #1a2b4c); margin: 0 0 4px; }
+.itemPrice { font-size: 13px; color: var(--muted, #6b7280); margin: 0; }
+
+.qtyControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 8px;
+  padding: 4px;
+}
+.qtyControl button {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: var(--bg, #f3f4f6);
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--ink, #1a2b4c);
+}
+.qtyControl span { min-width: 24px; text-align: center; font-weight: 700; font-size: 13px; }
+
+.itemTotal {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink, #1a2b4c);
+  margin: 0;
+  min-width: 80px;
+  text-align: right;
+}
+.removeBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: #fef2f2;
+  color: #dc2626;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.summary {
+  background: #fff;
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 16px;
+  padding: 20px;
+  position: sticky;
+  top: 90px;
+}
+.summary h2 { font-size: 16px; font-weight: 800; color: var(--ink, #1a2b4c); margin: 0 0 16px; }
+.row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted, #6b7280); padding: 8px 0; }
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 2px solid var(--ink, #1a2b4c);
+  margin: 8px 0 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink, #1a2b4c);
+}
+.totalRow strong { font-size: 20px; font-weight: 800; }
+.checkoutBtn {
+  width: 100%;
+  background: var(--warning, #f5a623);
+  color: var(--ink, #1a2b4c);
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+.checkoutBtn:hover { background: var(--warning-dark, #e0961e); }
+
+.empty {
+  background: #fff;
+  border: 1px dashed var(--line, #e5e7eb);
+  border-radius: 20px;
+  padding: 60px 20px;
+  text-align: center;
+}
+.empty h2 { font-family: "Bricolage Grotesque", sans-serif; color: var(--ink, #1a2b4c); margin: 0 0 8px; }
+.empty p { color: var(--muted, #6b7280); margin: 0 0 20px; }
+.shopBtn {
+  display: inline-block;
+  background: var(--ink, #1a2b4c);
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .summary { position: static; }
+}
+@media (max-width: 600px) {
+  .page { padding: 24px 0 60px; }
+  .cartItem { flex-wrap: wrap; gap: 10px; }
+  .itemInfo { flex: 1 0 100%; order: 2; }
+  .itemImg { order: 1; width: 60px; height: 60px; }
+  .qtyControl { order: 3; }
+  .itemTotal { order: 4; flex: 1; text-align: right; }
+  .removeBtn { order: 5; }
+}
